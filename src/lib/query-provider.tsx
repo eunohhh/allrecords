@@ -45,6 +45,7 @@ function QueryProvider({
       {children}
       <ReactQueryDevtools
         initialIsOpen={process.env.NEXT_PUBLIC_RUN_MODE === "local"}
+        buttonPosition="bottom-left"
       />
     </QueryClientProvider>
   );
