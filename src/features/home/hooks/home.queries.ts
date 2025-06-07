@@ -5,7 +5,7 @@ import type { GetRecordsParams, Record } from "../model/home.type";
 
 export const useRecordsQuery = (params: GetRecordsParams) => {
   return useQuery<Record[], Error>({
-    queryKey: [QUERY_KEY_RECORDS],
+    queryKey: [QUERY_KEY_RECORDS, params.category],
     queryFn: () => getRecords(params),
   });
 };
