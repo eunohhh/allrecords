@@ -1,10 +1,15 @@
 "use client";
 
-function HomeGridCard() {
+import type { Record } from "../model/home.type";
+
+interface HomeGridCardProps {
+  record: Record;
+}
+
+function HomeGridCard({ record }: HomeGridCardProps) {
   return (
     <div className="bg-green-500 rounded-lg py-12 px-2">
-      <h2>Title</h2>
-      <p>Description</p>
+      <h2>{record.title}</h2>
     </div>
   );
 }
