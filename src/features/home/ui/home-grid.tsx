@@ -1,25 +1,55 @@
 "use client";
 
-import type { Record } from "../model/home.type";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CHECKBOX_CATEGORY } from "@/constants/allrecords.consts";
+import { useEffect } from "react";
+import { useRecordsQuery } from "../hooks/home.queries";
+import { useHomeStore } from "../model/home.store";
 import HomeCheckbox from "./home-checkbox";
 import HomeGridCard from "./home-grid-card";
 
-interface HomeGridProps {
-  allRecords: Record[];
-}
+function HomeGrid() {
+  const { category } = useHomeStore();
 
-function HomeGrid({ allRecords }: HomeGridProps) {
+  const {
+    data: allRecords,
+    isPending,
+    error,
+  } = useRecordsQuery({
+    page: 1,
+    limit: 40,
+    search: "",
+    sort: "",
+    order: "",
+    category: category.join(","),
+  });
+
+  useEffect(() => {
+    if (error) {
+      console.error(error);
+    }
+  }, [error]);
+
   return (
     <section className="flex flex-col gap-2">
       <div className="flex flex-row gap-2 justify-end">
-        <HomeCheckbox label="daily" id="daily" />
-        <HomeCheckbox label="hosoop" id="hosoop" />
-        <HomeCheckbox label="work" id="work" />
+        {CHECKBOX_CATEGORY.map((category) => (
+          <HomeCheckbox
+            key={category.id}
+            label={category.label}
+            id={category.id}
+          />
+        ))}
       </div>
       <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
-        {allRecords.map((record) => (
-          <HomeGridCard key={record.id} record={record} />
-        ))}
+        {isPending && (
+          <Skeleton className="min-w-10 min-h-30 rounded-lg bg-gray-400" />
+        )}
+        {allRecords
+          ? allRecords.map((record) => (
+              <HomeGridCard key={record.id} record={record} />
+            ))
+          : null}
       </div>
     </section>
   );
