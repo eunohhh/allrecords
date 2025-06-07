@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get("search") || "";
   const sort = searchParams.get("sort") || "created_at";
   const order = searchParams.get("order") || "desc";
+  const category = searchParams.get("category")?.split(",") || [];
 
   const offset = (Number(page) - 1) * Number(limit);
   const to = offset + Number(limit);
@@ -21,6 +22,10 @@ export async function GET(request: NextRequest) {
 
   if (sort) {
     query.order(sort, { ascending: order === "asc" });
+  }
+
+  if (category.length > 0) {
+    query.in("category", category);
   }
 
   const { data, error } = await query;
