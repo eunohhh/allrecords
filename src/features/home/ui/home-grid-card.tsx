@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { Record } from "../model/home.type";
 
 interface HomeGridCardProps {
@@ -8,9 +9,12 @@ interface HomeGridCardProps {
 
 function HomeGridCard({ record }: HomeGridCardProps) {
   return (
-    <div className="bg-green-500 rounded-lg py-12 px-2">
-      <h2>{record.title}</h2>
-    </div>
+    <Link href={`/${record.slug}`}>
+      <div className="bg-green-500 rounded-lg py-12 px-2">
+        <h2>{record.title}</h2>
+        <p>{record.slug}</p>
+      </div>
+    </Link>
   );
 }
 
