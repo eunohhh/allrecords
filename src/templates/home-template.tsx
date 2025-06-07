@@ -1,8 +1,31 @@
 "use client";
 
-import { HomeFloating, HomeGrid } from "@/features/home";
+import { HomeFloating, HomeGrid, useRecordsQuery } from "@/features/home";
+import { useEffect } from "react";
 
 function HomeTemplate() {
+  const {
+    data: allRecords,
+    isPending,
+    error,
+  } = useRecordsQuery({
+    page: 1,
+    limit: 40,
+    search: "",
+    sort: "",
+    order: "",
+  });
+
+  useEffect(() => {
+    if (error) {
+      console.error(error);
+    }
+  }, [error]);
+
+  if (isPending || !allRecords) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <main className="flex flex-col h-svh px-2">
       <div className="flex flex-col gap-4 pb-4">
@@ -19,7 +42,7 @@ function HomeTemplate() {
           including versions of Lorem Ipsum.
         </p>
       </div>
-      <HomeGrid />
+      <HomeGrid allRecords={allRecords} />
       <HomeFloating />
     </main>
   );
