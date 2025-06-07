@@ -8,4 +8,5 @@ export interface GetRecordsParams {
   search: string;
   sort: string;
   order: string;
+  category: string;
 }
