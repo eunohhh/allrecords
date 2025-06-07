@@ -1,6 +1,6 @@
 "use client";
 
-import { HomeGrid } from "@/features/home";
+import { HomeFloating, HomeGrid } from "@/features/home";
 
 function HomeTemplate() {
   return (
@@ -20,6 +20,7 @@ function HomeTemplate() {
         </p>
       </div>
       <HomeGrid />
+      <HomeFloating />
     </main>
   );
 }
