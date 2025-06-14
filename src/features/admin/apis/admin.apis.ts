@@ -7,11 +7,11 @@ export function getAdminRecords(params: RecordsParams) {
 }
 
 export function postAdminRecords(params: RecordsParams) {
-  return api.post<Record[], Record[]>("/api/allrecords", params);
+  return api.post<Record, Record>("/api/allrecords", params);
 }
 
-export function deleteAdminRecords(id: string) {
-  return api.delete<Record[], Record[]>(`/api/allrecords/${id}`);
+export function deleteAdminRecords(params: { ids: string[] }) {
+  return api.post<Record[], Record[]>("/api/allrecords/delete", params);
 }
 
 export function putAdminRecords(id: string, params: RecordsParams) {
