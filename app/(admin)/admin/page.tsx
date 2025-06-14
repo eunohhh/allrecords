@@ -1,5 +1,7 @@
+import AdminTemplate from "@/templates/admin-template";
+
 function AdminPage() {
-  return <div>AdminPage</div>;
+  return <AdminTemplate />;
 }
 
 export default AdminPage;
