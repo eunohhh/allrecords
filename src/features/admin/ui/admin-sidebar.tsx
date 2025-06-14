@@ -16,6 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { getUser } from "@/lib/server-utils";
 import { AtSign, ChevronUp, Disc3, User2 } from "lucide-react";
 import Link from "next/link";
 
@@ -32,7 +33,11 @@ const items = [
   },
 ];
 
-function AdminSidebar() {
+async function AdminSidebar() {
+  const user = await getUser();
+
+  console.log(user);
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -67,16 +72,15 @@ function AdminSidebar() {
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
-              >
+              <DropdownMenuContent side="top" className="w-50 cursor-pointer">
                 <DropdownMenuItem>
-                  <span>Account</span>
+                  <span>{user?.user_metadata.name}</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Sign out</span>
-                </DropdownMenuItem>
+                <Link href="/api/auth/logout">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <span>로그아웃</span>
+                  </DropdownMenuItem>
+                </Link>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
