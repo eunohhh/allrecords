@@ -16,7 +16,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { getUser } from "@/lib/server-utils";
+import type { User } from "@supabase/supabase-js";
 import { AtSign, ChevronUp, Disc3, User2 } from "lucide-react";
 import Link from "next/link";
 
@@ -33,11 +33,11 @@ const items = [
   },
 ];
 
-async function AdminSidebar() {
-  const user = await getUser();
+interface AdminSidebarProps {
+  user: User | null;
+}
 
-  console.log(user);
-
+function AdminSidebar({ user }: AdminSidebarProps) {
   return (
     <Sidebar>
       <SidebarHeader>
