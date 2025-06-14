@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import type { Record } from "@/types/allrecords.types";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -29,6 +30,22 @@ export async function GET(request: NextRequest) {
   }
 
   const { data, error } = await query;
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json(data, { status: 200 });
+}
+
+export async function POST(request: NextRequest) {
+  const supabase = await createClient();
+  const records: Record = await request.json();
+  const { data, error } = await supabase
+    .from("allrecords")
+    .insert(records)
+    .select()
+    .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
