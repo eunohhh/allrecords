@@ -22,7 +22,7 @@ export const useAdminRecordsQuery = (params: RecordsParams) => {
 
 export const useAdminRecordsMutation = () => {
   const queryClient = useQueryClient();
-  return useMutation<Record[], Error, RecordsParams>({
+  return useMutation<Record, Error, RecordsParams>({
     mutationFn: (params) => postAdminRecords(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_RECORDS] });
@@ -32,8 +32,8 @@ export const useAdminRecordsMutation = () => {
 
 export const useAdminRecordsDeleteMutation = () => {
   const queryClient = useQueryClient();
-  return useMutation<Record[], Error, string>({
-    mutationFn: (id) => deleteAdminRecords(id),
+  return useMutation<Record[], Error, string[]>({
+    mutationFn: (ids) => deleteAdminRecords({ ids }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_RECORDS] });
     },
