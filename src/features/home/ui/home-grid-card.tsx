@@ -1,7 +1,7 @@
 "use client";
 
+import type { Record } from "@/types/allrecords.types";
 import Link from "next/link";
-import type { Record } from "../model/home.type";
 
 interface HomeGridCardProps {
   record: Record;
