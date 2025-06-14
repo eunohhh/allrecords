@@ -1,5 +1,5 @@
 import { QUERY_KEY_RECORD } from "@/constants/allrecords.consts";
-import type { Record } from "@/features/home";
+import type { Record } from "@/types/allrecords.types";
 import { useQuery } from "@tanstack/react-query";
 import { getRecord } from "../apis/record.apis";
 
