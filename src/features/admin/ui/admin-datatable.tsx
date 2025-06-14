@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  type ColumnDef,
   type ColumnFiltersState,
+  type RowSelectionState,
   type SortingState,
   type VisibilityState,
   flexRender,
@@ -12,16 +12,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Loader2,
-  Pencil,
-  Trash2,
-} from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -37,11 +30,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Record } from "@/types/allrecords.types";
-import { format } from "date-fns";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { useAdminRecordsQuery } from "../hooks/admin.queries";
+import { columns } from "../model/admin.columns";
 import { useAdminStore } from "../model/admin.store";
 import AdminPagination from "./admin-pagination";
 
@@ -60,127 +52,9 @@ const switchColumnIdToKorean = (id: string) => {
   }
 };
 
-export const columns: ColumnDef<Record>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "category",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          카테고리
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("category")}</div>
-    ),
-  },
-  {
-    accessorKey: "title",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          제목
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("title")}</div>,
-  },
-  {
-    accessorKey: "created_at",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          생성일
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div>{format(row.getValue("created_at"), "yyyy-MM-dd HH:mm")}</div>
-    ),
-  },
-  {
-    accessorKey: "updated_at",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          수정일
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div>{format(row.getValue("updated_at"), "yyyy-MM-dd HH:mm")}</div>
-    ),
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const record = row.original;
-      return (
-        <div>
-          <Button
-            variant="ghost"
-            className="h-8 w-8 p-0 cursor-pointer"
-            onClick={() => {
-              console.log(row.original);
-            }}
-          >
-            <Trash2 />
-          </Button>
-          <Button
-            variant="ghost"
-            className="h-8 w-8 p-0 cursor-pointer"
-            onClick={() => {}}
-          >
-            <Pencil />
-          </Button>
-        </div>
-      );
-    },
-  },
-];
-
 function AdminDatatable() {
   const [page, setPage] = useQueryState("page", parseAsInteger);
-  const { category } = useAdminStore();
+  const { category, setSelectedItems } = useAdminStore();
   const { data, isPending, error } = useAdminRecordsQuery({
     category: category.join(","),
     page: page ?? 1,
@@ -192,7 +66,7 @@ function AdminDatatable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const table = useReactTable({
     data: data ?? [],
@@ -219,9 +93,11 @@ function AdminDatatable() {
     }
   }, [page, setPage]);
 
+  // console.log(table.getRowModel().rows.filter((row) => row.getIsSelected()));
+
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-2">
         <Input
           placeholder="Filter titles..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
