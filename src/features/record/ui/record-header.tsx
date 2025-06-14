@@ -1,6 +1,6 @@
 "use client";
 
-import type { Record } from "@/features/home";
+import type { Record } from "@/types/allrecords.types";
 
 interface RecordHeaderProps {
   record: Record;
