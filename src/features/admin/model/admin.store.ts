@@ -4,6 +4,8 @@ import { create } from "zustand";
 interface AdminStore {
   category: string[];
   setCategory: (category: string[]) => void;
+  selectedItem: Record | null;
+  setSelectedItem: (selectedItem: Record | null) => void;
   selectedItems: Record[];
   setSelectedItems: (selectedItem: Record) => void;
   deleteSelectedItems: (selectedItem: Record) => void;
@@ -14,6 +16,8 @@ interface AdminStore {
 export const useAdminStore = create<AdminStore>((set) => ({
   category: ["daily", "hosoop", "work"],
   setCategory: (category) => set({ category }),
+  selectedItem: null,
+  setSelectedItem: (selectedItem) => set({ selectedItem }),
   selectedItems: [],
   setSelectedItems: (selectedItem) =>
     set((state) => ({
