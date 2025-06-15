@@ -1,20 +1,12 @@
 "use client";
 
-import { useShallow } from "zustand/react/shallow";
 import { useAdminRecordsDeleteMutation } from "../hooks/admin.queries";
 import { useAdminStore } from "../model/admin.store";
 import AdminAddRecordButton from "./admin-addrecord-button";
 import AdminDeleteButton from "./admin-delete-button";
-import AdminModal from "./admin-modal";
 
 function AdminHeader() {
-  const { selectedItems, isModalOpen, setIsModalOpen } = useAdminStore(
-    useShallow((state) => ({
-      selectedItems: state.selectedItems,
-      isModalOpen: state.isModalOpen,
-      setIsModalOpen: state.setIsModalOpen,
-    }))
-  );
+  const { selectedItems } = useAdminStore();
 
   const {
     mutate: deleteRecords,
@@ -33,11 +25,10 @@ function AdminHeader() {
           Records
         </h1>
         <div className="flex items-center justify-end gap-2">
-          <AdminAddRecordButton setIsModalOpen={setIsModalOpen} />
+          <AdminAddRecordButton />
           <AdminDeleteButton onClick={handleDeleteRecords} />
         </div>
       </div>
-      <AdminModal open={isModalOpen} setIsModalOpen={setIsModalOpen} />
     </>
   );
 }
