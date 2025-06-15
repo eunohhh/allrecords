@@ -6,9 +6,11 @@ import type { Record } from "@/types/allrecords.types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
+import { useAdminRecordsDeleteMutation } from "../hooks/admin.queries";
 import { useAdminStore } from "./admin.store";
 
-const { setSelectedItems, deleteSelectedItems } = useAdminStore.getState();
+const { setSelectedItems, deleteSelectedItems, setSelectedItem } =
+  useAdminStore.getState();
 
 export const columns: ColumnDef<Record>[] = [
   {
@@ -111,21 +113,26 @@ export const columns: ColumnDef<Record>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const record = row.original;
+
+      const { mutate: deleteRecords } = useAdminRecordsDeleteMutation();
+
+      const handleDeleteRecord = () => deleteRecords([record.id]);
+
       return (
         <div>
           <Button
             variant="ghost"
             className="h-8 w-8 p-0 cursor-pointer"
-            onClick={() => {
-              console.log(row.original);
-            }}
+            onClick={handleDeleteRecord}
           >
             <Trash2 />
           </Button>
           <Button
             variant="ghost"
             className="h-8 w-8 p-0 cursor-pointer"
-            onClick={() => {}}
+            onClick={() => {
+              setSelectedItem(record);
+            }}
           >
             <Pencil />
           </Button>
