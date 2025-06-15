@@ -9,7 +9,6 @@ interface RecordImagesProps {
 }
 
 function RecordImages({ recordImages }: RecordImagesProps) {
-  console.log(recordImages);
   return (
     <div className="flex flex-col gap-4">
       {recordImages?.map((image) =>
@@ -19,7 +18,7 @@ function RecordImages({ recordImages }: RecordImagesProps) {
               src={(image as RecordImage).url}
               alt={(image as RecordImage).desc}
               fill
-              className="object-cover"
+              className="object-contain"
             />
           </div>
         ) : null
