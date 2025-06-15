@@ -4,4 +4,6 @@ export { default as AdminImageModal } from "./ui/admin-image-modal";
 export { default as AdminLoginButton } from "./ui/admin-login-button";
 export { default as AdminModal } from "./ui/admin-modal";
 export { default as AdminPagination } from "./ui/admin-pagination";
+export { default as AdminSelect } from "./ui/admin-select";
 export { default as AdminSidebar } from "./ui/admin-sidebar";
+export { default as AdminSortableImage } from "./ui/admin-sortable-image";
