@@ -9,22 +9,28 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { RecordImagePost } from "@/types/allrecords.types";
 import { Image, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import { toast } from "sonner";
+import type { z } from "zod";
+import type { formSchema } from "../model/admin.schema";
 
 interface AdminImageModalProps {
   open: boolean;
   setIsModalOpen: (isModalOpen: boolean) => void;
-  handleImageAdd: (image: Partial<RecordImagePost>) => void;
+  // handleImageAdd: (image: Partial<RecordImagePost>) => void;
+  form: UseFormReturn<z.infer<typeof formSchema>>;
 }
 
 function AdminImageModal({
   open,
   setIsModalOpen,
-  handleImageAdd,
+  // handleImageAdd,
+  form,
 }: AdminImageModalProps) {
   const [imageDescription, setImageDescription] = useState("");
   const [image, setImage] = useState<{
@@ -32,6 +38,7 @@ function AdminImageModal({
     file: File;
   } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleAddImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -52,10 +59,18 @@ function AdminImageModal({
   };
 
   const handleSubmit = () => {
-    handleImageAdd({
-      file: image?.file,
-      description: imageDescription,
-    });
+    if (!image || !imageDescription) {
+      toast.error("이미지와 설명을 모두 입력해주세요.");
+      return;
+    }
+    form.setValue("images", [
+      ...form.getValues("images"),
+      {
+        file: image?.file!,
+        id: form.getValues("images").length,
+        description: imageDescription,
+      },
+    ]);
     setIsModalOpen(false);
   };
 
@@ -79,7 +94,7 @@ function AdminImageModal({
           {image && (
             <div className="relative flex items-center justify-center gap-2">
               <img
-                src={image.url}
+                src={image.url || URL.createObjectURL(image.file!)}
                 alt="이미지"
                 className="h-40 w-40 object-cover"
               />
@@ -92,21 +107,29 @@ function AdminImageModal({
               </Button>
             </div>
           )}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleAddImage}
-            className="hidden"
-            ref={inputRef}
+          <FormField
+            control={form.control}
+            name="images"
+            render={({ field }) => (
+              <>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAddImage}
+                  className="hidden"
+                  ref={inputRef}
+                />
+                <Button
+                  variant="outline"
+                  className="cursor-pointer"
+                  onClick={handleImageAddButtonClick}
+                >
+                  <Image />
+                  <span>이미지 추가</span>
+                </Button>
+              </>
+            )}
           />
-          <Button
-            variant="outline"
-            className="cursor-pointer"
-            onClick={handleImageAddButtonClick}
-          >
-            <Image />
-            <span>이미지 추가</span>
-          </Button>
         </div>
         <div className="grid gap-3">
           <Label htmlFor="image">이미지 설명</Label>
@@ -115,13 +138,19 @@ function AdminImageModal({
             name="image"
             placeholder="이미지 설명을 입력해주세요."
             onKeyDown={(e) => {
-              if (e.key === "Enter") handleSubmit();
+              if (e.key === "Enter") buttonRef.current?.click();
             }}
             onChange={(e) => setImageDescription(e.target.value)}
           />
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit} className="cursor-pointer">
+          <Button
+            ref={buttonRef}
+            disabled={!image || !imageDescription}
+            type="button"
+            onClick={handleSubmit}
+            className="cursor-pointer"
+          >
             추가
           </Button>
         </DialogFooter>
