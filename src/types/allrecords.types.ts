@@ -10,3 +10,15 @@ export interface RecordsParams {
   order: string;
   category: string;
 }
+
+export interface RecordImage {
+  id: string;
+  url: string;
+  description: string;
+}
+
+export interface RecordImagePost {
+  id: number;
+  file: File;
+  description: string;
+}
