@@ -114,6 +114,9 @@ function AdminImageModal({
             id="image"
             name="image"
             placeholder="이미지 설명을 입력해주세요."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSubmit();
+            }}
             onChange={(e) => setImageDescription(e.target.value)}
           />
         </div>
