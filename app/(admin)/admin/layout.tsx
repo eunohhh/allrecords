@@ -1,4 +1,5 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 import { AdminSidebar } from "@/features/admin";
 import { getUser } from "@/lib/server-utils";
 import type { PropsWithChildren } from "react";
@@ -13,6 +14,7 @@ async function AdminLayout({ children }: PropsWithChildren) {
         <SidebarTrigger className="cursor-pointer" />
         {children}
       </main>
+      <Toaster richColors position="top-center" />
     </SidebarProvider>
   );
 }
