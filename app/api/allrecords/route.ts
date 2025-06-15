@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Record } from "@/types/allrecords.types";
+import type { RecordImage, RecordImagePost } from "@/types/allrecords.types";
 import { type NextRequest, NextResponse } from "next/server";
+import sharp from "sharp";
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -40,10 +41,73 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
-  const records: Record = await request.json();
-  const { data, error } = await supabase
+  const formData = await request.formData();
+
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const category = formData.get("category") as string;
+  const slug = formData.get("slug") as string;
+  const created_at = formData.get("created_at") as string;
+  const updated_at = formData.get("updated_at") as string;
+  const imagesInfoString = formData.get("imagesInfo") as string;
+  const imagesInfo: Omit<RecordImagePost, "file">[] =
+    JSON.parse(imagesInfoString);
+  const imageFiles = formData.getAll("images") as File[];
+
+  const uploadedImages: RecordImage[] = [];
+
+  for (let i = 0; i < imageFiles.length; i++) {
+    const file = imageFiles[i];
+    const info = imagesInfo[i];
+
+    const imageBuffer = await file.arrayBuffer();
+
+    const processedImageBuffer = await sharp(imageBuffer)
+      .webp({ quality: 80 })
+      .toBuffer();
+
+    const originalFileName = file.name.split(".").slice(0, -1).join(".");
+    const fileName = `${crypto.randomUUID()}-${originalFileName}.webp`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("images")
+      .upload(fileName, processedImageBuffer, {
+        contentType: "image/webp",
+      });
+
+    if (uploadError) {
+      console.error("Image upload error:", uploadError);
+      return NextResponse.json(
+        { error: "Failed to upload image." },
+        { status: 500 }
+      );
+    }
+
+    const { data: urlData } = supabase.storage
+      .from("images")
+      .getPublicUrl(uploadData.path);
+
+    uploadedImages.push({
+      id: info.id,
+      url: urlData.publicUrl,
+      desc: info.description,
+    });
+  }
+
+  const recordToInsert = {
+    id: crypto.randomUUID(),
+    title,
+    description,
+    category,
+    slug,
+    created_at,
+    updated_at,
+    images: uploadedImages,
+  };
+
+  const { data: newRecord, error } = await supabase
     .from("allrecords")
-    .insert(records)
+    .insert(recordToInsert as any)
     .select()
     .single();
 
@@ -51,5 +115,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data, { status: 200 });
+  return NextResponse.json(newRecord, { status: 201 });
 }
