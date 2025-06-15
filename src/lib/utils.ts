@@ -27,4 +27,8 @@ api.interceptors.response.use(
   }
 );
 
+export function formatDateToTZ(date: Date) {
+  return date.toISOString().replace("T", " ").replace("Z", "+00");
+}
+
 export default api;
