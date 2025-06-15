@@ -1,5 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
-import type { RecordImage, RecordImagePost } from "@/types/allrecords.types";
+import type {
+  Record,
+  RecordImage,
+  RecordImagePost,
+} from "@/types/allrecords.types";
+import type { Json } from "@/types/supabase";
 import { type NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 
@@ -90,11 +95,11 @@ export async function POST(request: NextRequest) {
     uploadedImages.push({
       id: info.id,
       url: urlData.publicUrl,
-      desc: info.description,
+      desc: info.desc,
     });
   }
 
-  const recordToInsert = {
+  const recordToInsert: Record = {
     id: crypto.randomUUID(),
     title,
     description,
@@ -102,12 +107,12 @@ export async function POST(request: NextRequest) {
     slug,
     created_at,
     updated_at,
-    images: uploadedImages,
+    images: uploadedImages as unknown as Json[],
   };
 
   const { data: newRecord, error } = await supabase
     .from("allrecords")
-    .insert(recordToInsert as any)
+    .insert(recordToInsert)
     .select()
     .single();
 
