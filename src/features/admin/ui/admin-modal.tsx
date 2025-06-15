@@ -42,6 +42,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import type { z } from "zod";
 import {
   useAdminRecordsMutation,
@@ -62,6 +63,14 @@ const inputNames: {
   { name: "slug", label: "슬러그" },
 ];
 
+const defaultValues = {
+  title: "",
+  description: "",
+  category: "",
+  slug: "",
+  images: [],
+};
+
 interface AdminModalProps {
   open: boolean;
   setIsModalOpen: (isModalOpen: boolean) => void;
@@ -69,7 +78,7 @@ interface AdminModalProps {
 }
 
 function AdminModal({ open, setIsModalOpen, record }: AdminModalProps) {
-  const { selectedItem, setSelectedItem } = useAdminStore();
+  const { setSelectedItem } = useAdminStore();
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const {
     mutate: postAdminRecords,
@@ -96,10 +105,10 @@ function AdminModal({ open, setIsModalOpen, record }: AdminModalProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: selectedItem?.title || "",
-      description: selectedItem?.description || "",
-      category: selectedItem?.category || "",
-      slug: selectedItem?.slug || "",
+      title: record?.title || "",
+      description: record?.description || "",
+      category: record?.category || "",
+      slug: record?.slug || "",
       images: (record?.images as unknown as RecordImagePost[]) || [],
     },
   });
@@ -111,7 +120,10 @@ function AdminModal({ open, setIsModalOpen, record }: AdminModalProps) {
 
   const handleOpenChange = (isOpen: boolean) => {
     setIsModalOpen(isOpen);
-    if (!isOpen) setSelectedItem(null);
+    if (!isOpen) {
+      form.reset(defaultValues);
+      setSelectedItem(null);
+    }
   };
 
   const handleImageModalOpen = () => {
@@ -127,7 +139,6 @@ function AdminModal({ open, setIsModalOpen, record }: AdminModalProps) {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-
     if (over && active.id !== over.id) {
       const oldIndex = fields.findIndex((field) => field.id === active.id);
       const newIndex = fields.findIndex((field) => field.id === over.id);
@@ -142,11 +153,21 @@ function AdminModal({ open, setIsModalOpen, record }: AdminModalProps) {
       ...data,
       created_at: formatDateToTZ(now),
       updated_at: formatDateToTZ(now),
-      images: data.images.map((image) => ({
-        id: image.id,
-        file: image.file,
-        description: image.description,
-      })),
+      images: data.images.map((image) =>
+        image.file
+          ? {
+              id: image.id,
+              file: image.file,
+              url: "",
+              desc: image.desc,
+            }
+          : {
+              id: image.id,
+              url: image.url,
+              file: null,
+              desc: image.desc,
+            }
+      ),
     };
     console.log("New record:", newRecord);
     if (record) {
@@ -154,7 +175,7 @@ function AdminModal({ open, setIsModalOpen, record }: AdminModalProps) {
     } else {
       postAdminRecords(newRecord);
     }
-    form.reset();
+    form.reset(defaultValues);
     setIsModalOpen(false);
   };
 
@@ -171,22 +192,33 @@ function AdminModal({ open, setIsModalOpen, record }: AdminModalProps) {
         slug: record.slug,
         images,
       });
+    } else {
+      form.reset(defaultValues);
     }
   }, [record, form]);
 
   useEffect(() => {
-    if (!open) form.reset();
-  }, [open, form]);
+    if (!open) {
+      form.reset(defaultValues);
+      setSelectedItem(null);
+    }
+  }, [open, form, setSelectedItem]);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="w-full sm:max-w-3xl">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit, (errors) => {
+              console.error("Form validation errors:", errors);
+              toast.error("입력값을 확인해주세요.");
+            })}
+            className="space-y-4"
+          >
             <DialogHeader>
-              <DialogTitle>{selectedItem ? "수정" : "생성"}</DialogTitle>
+              <DialogTitle>{record ? "수정" : "생성"}</DialogTitle>
               <DialogDescription className="hidden">
-                {selectedItem ? "수정" : "생성"}할 내용을 입력해주세요.
+                {record ? "수정" : "생성"}할 내용을 입력해주세요.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4">
