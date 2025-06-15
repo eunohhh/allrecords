@@ -68,7 +68,7 @@ function AdminImageModal({
       {
         file: image?.file!,
         id: form.getValues("images").length,
-        description: imageDescription,
+        desc: imageDescription,
       },
     ]);
     setIsModalOpen(false);
