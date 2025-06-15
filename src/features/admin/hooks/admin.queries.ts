@@ -22,7 +22,7 @@ export const useAdminRecordsQuery = (params: RecordsParams) => {
 
 export const useAdminRecordsMutation = () => {
   const queryClient = useQueryClient();
-  return useMutation<Record, Error, RecordsParams>({
+  return useMutation<Record, Error, Record>({
     mutationFn: (params) => postAdminRecords(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_RECORDS] });
