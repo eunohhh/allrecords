@@ -41,7 +41,7 @@ function AdminSortableImage({ image, onDelete }: AdminSortableImageProps) {
       />
       <img
         src={imageSrc}
-        alt={image.description}
+        alt={image.desc}
         className="h-full w-full object-cover"
       />
       <Button
