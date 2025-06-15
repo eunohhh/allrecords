@@ -6,7 +6,7 @@ export function getAdminRecords(params: RecordsParams) {
   return api.get<Record[], Record[]>("/api/allrecords", { params });
 }
 
-export function postAdminRecords(params: RecordsParams) {
+export function postAdminRecords(params: Record) {
   return api.post<Record, Record>("/api/allrecords", params);
 }
 
