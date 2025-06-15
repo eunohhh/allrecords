@@ -10,10 +10,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import type { RecordImagePost } from "@/types/allrecords.types";
+import { formatDateToTZ } from "@/lib/utils";
+import type {
+  Record,
+  RecordImagePost,
+  RecordPost,
+} from "@/types/allrecords.types";
 import {
   DndContext,
   type DragEndEvent,
@@ -25,73 +35,52 @@ import {
 } from "@dnd-kit/core";
 import {
   SortableContext,
-  arrayMove,
   sortableKeyboardCoordinates,
-  useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { Plus, X } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import type { z } from "zod";
+import {
+  useAdminRecordsMutation,
+  useAdminRecordsPutMutation,
+} from "../hooks/admin.queries";
+import { formSchema } from "../model/admin.schema";
 import { useAdminStore } from "../model/admin.store";
 import AdminImageModal from "./admin-image-modal";
+import AdminSelect from "./admin-select";
+import AdminSortableImage from "./admin-sortable-image";
+
+const inputNames: {
+  name: "title" | "description" | "slug";
+  label: string;
+}[] = [
+  { name: "title", label: "제목" },
+  { name: "description", label: "내용" },
+  { name: "slug", label: "슬러그" },
+];
 
 interface AdminModalProps {
   open: boolean;
   setIsModalOpen: (isModalOpen: boolean) => void;
+  record?: Record;
 }
 
-interface SortableImageProps {
-  image: RecordImagePost;
-  onDelete: (id: number) => void;
-}
-
-function SortableImage({ image, onDelete }: SortableImageProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: image.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onDelete(image.id);
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="relative flex h-20 w-20 items-center justify-center rounded-md border border-gray-200 p-0 sm:h-30 sm:w-30 md:h-40 md:w-40"
-    >
-      <div
-        {...attributes}
-        {...listeners}
-        className="absolute inset-0 cursor-move"
-      />
-      <img
-        src={URL.createObjectURL(image.file)}
-        alt={image.description}
-        className="h-full w-full object-cover"
-      />
-      <Button
-        variant="secondary"
-        className="absolute right-0 top-0 h-4 w-4 p-0 cursor-pointer z-10"
-        onClick={handleDelete}
-      >
-        <X />
-      </Button>
-    </div>
-  );
-}
-
-function AdminModal({ open, setIsModalOpen }: AdminModalProps) {
+function AdminModal({ open, setIsModalOpen, record }: AdminModalProps) {
   const { selectedItem, setSelectedItem } = useAdminStore();
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const [images, setImages] = useState<RecordImagePost[]>([]);
+  const {
+    mutate: postAdminRecords,
+    isPending: isCreating,
+    error: creatingError,
+  } = useAdminRecordsMutation();
+  const {
+    mutate: putAdminRecords,
+    isPending: isUpdating,
+    error: updatingError,
+  } = useAdminRecordsPutMutation();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -104,6 +93,22 @@ function AdminModal({ open, setIsModalOpen }: AdminModalProps) {
     })
   );
 
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: selectedItem?.title || "",
+      description: selectedItem?.description || "",
+      category: selectedItem?.category || "",
+      slug: selectedItem?.slug || "",
+      images: (record?.images as unknown as RecordImagePost[]) || [],
+    },
+  });
+
+  const { fields, remove, move } = useFieldArray({
+    control: form.control,
+    name: "images",
+  });
+
   const handleOpenChange = (isOpen: boolean) => {
     setIsModalOpen(isOpen);
     if (!isOpen) setSelectedItem(null);
@@ -113,98 +118,114 @@ function AdminModal({ open, setIsModalOpen }: AdminModalProps) {
     setIsImageModalOpen(true);
   };
 
-  const handleImageAdd = (image: Partial<RecordImagePost>) => {
-    const newImage = {
-      ...image,
-      id: images.length,
-    } as RecordImagePost;
-    setImages([...images, newImage]);
-  };
-
   const handleImageDelete = (id: number) => {
-    const filteredImages = images.filter((img) => img.id !== id);
-    const orderedImages = filteredImages.map((img, index) => ({
-      ...img,
-      id: index,
-    }));
-    setImages(orderedImages);
+    const index = fields.findIndex((field) => field.id === id);
+    if (index !== -1) {
+      remove(index);
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      setImages((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-        const newItems = arrayMove(items, oldIndex, newIndex);
+      const oldIndex = fields.findIndex((field) => field.id === active.id);
+      const newIndex = fields.findIndex((field) => field.id === over.id);
 
-        // id 값만 교환
-        const tempId = newItems[oldIndex].id;
-        newItems[oldIndex].id = newItems[newIndex].id;
-        newItems[newIndex].id = tempId;
-
-        return newItems;
-      });
+      move(oldIndex, newIndex);
     }
   };
 
-  useEffect(() => {
-    if (!open) {
-      setImages([]);
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
+    const now = new Date();
+    const newRecord: RecordPost = {
+      ...data,
+      created_at: formatDateToTZ(now),
+      updated_at: formatDateToTZ(now),
+      images: data.images.map((image) => ({
+        id: image.id,
+        file: image.file,
+        description: image.description,
+      })),
+    };
+    console.log("New record:", newRecord);
+    if (record) {
+      putAdminRecords({ id: record.id, data: newRecord });
+    } else {
+      postAdminRecords(newRecord);
     }
-  }, [open]);
+    form.reset();
+    setIsModalOpen(false);
+  };
+
+  useEffect(() => {
+    if (record) {
+      const images =
+        record.images && record.images.length > 0
+          ? (record.images as unknown as RecordImagePost[])
+          : [];
+      form.reset({
+        title: record.title,
+        description: record.description,
+        category: record.category,
+        slug: record.slug,
+        images,
+      });
+    }
+  }, [record, form]);
+
+  useEffect(() => {
+    if (!open) form.reset();
+  }, [open, form]);
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={handleOpenChange}>
-        <form>
-          <DialogContent className="w-full sm:max-w-3xl">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="w-full sm:max-w-3xl">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <DialogHeader>
               <DialogTitle>{selectedItem ? "수정" : "생성"}</DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="hidden">
                 {selectedItem ? "수정" : "생성"}할 내용을 입력해주세요.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4">
+              {inputNames.map((input) => (
+                <div className="grid gap-3" key={input.name}>
+                  <FormField
+                    control={form.control}
+                    name={input.name}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{input.label}</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={`${input.label}을 입력해주세요.`}
+                            {...field}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              ))}
+
               <div className="grid gap-3">
-                <Label htmlFor="name-1">제목</Label>
-                <Input
-                  id="name-1"
-                  name="name"
-                  placeholder="제목을 입력해주세요."
-                  defaultValue={selectedItem ? selectedItem.title : ""}
-                />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="description">내용</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="내용을 입력해주세요."
-                  defaultValue={selectedItem ? selectedItem.description : ""}
-                />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="category">카테고리</Label>
-                <Input
-                  id="category"
+                <FormField
+                  control={form.control}
                   name="category"
-                  placeholder="카테고리를 입력해주세요."
-                  defaultValue={selectedItem ? selectedItem.category : ""}
-                />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="slug">슬러그</Label>
-                <Input
-                  id="slug"
-                  name="slug"
-                  placeholder="슬러그를 입력해주세요."
-                  defaultValue={selectedItem ? selectedItem.slug : ""}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>카테고리</FormLabel>
+                      <FormControl>
+                        <AdminSelect field={field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
                 />
               </div>
 
-              {images.length > 0 && (
+              {fields.length > 0 && (
                 <div className="grid grid-cols-4 place-items-center gap-2 rounded-md border border-gray-300 py-2 px-1">
                   <DndContext
                     sensors={sensors}
@@ -212,13 +233,13 @@ function AdminModal({ open, setIsModalOpen }: AdminModalProps) {
                     onDragEnd={handleDragEnd}
                   >
                     <SortableContext
-                      items={images.map((img) => img.id)}
+                      items={fields.map((field) => field.id)}
                       strategy={verticalListSortingStrategy}
                     >
-                      {images.map((image) => (
-                        <SortableImage
-                          key={image.id}
-                          image={image}
+                      {fields.map((field) => (
+                        <AdminSortableImage
+                          key={field.id}
+                          image={field}
                           onDelete={handleImageDelete}
                         />
                       ))}
@@ -226,9 +247,9 @@ function AdminModal({ open, setIsModalOpen }: AdminModalProps) {
                   </DndContext>
                 </div>
               )}
-
               <div className="grid gap-3">
                 <Button
+                  type="button"
                   className="cursor-pointer"
                   onClick={handleImageModalOpen}
                 >
@@ -238,19 +259,27 @@ function AdminModal({ open, setIsModalOpen }: AdminModalProps) {
             </div>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="cursor-pointer"
+                >
+                  Cancel
+                </Button>
               </DialogClose>
-              <Button type="submit">Save changes</Button>
+              <Button type="submit" className="cursor-pointer">
+                Save changes
+              </Button>
             </DialogFooter>
-          </DialogContent>
-        </form>
-      </Dialog>
+          </form>
+        </Form>
+      </DialogContent>
       <AdminImageModal
         open={isImageModalOpen}
         setIsModalOpen={setIsImageModalOpen}
-        handleImageAdd={handleImageAdd}
+        form={form}
       />
-    </>
+    </Dialog>
   );
 }
 
