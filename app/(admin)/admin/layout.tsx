@@ -1,8 +1,12 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { AdminSidebar } from "@/features/admin";
 import { getUser } from "@/lib/server-utils";
+import dynamic from "next/dynamic";
 import type { PropsWithChildren } from "react";
+const SidebarProvider = dynamic(() =>
+  import("@/components/ui/sidebar").then((mod) => mod.SidebarProvider)
+);
 
 async function AdminLayout({ children }: PropsWithChildren) {
   const user = await getUser();
