@@ -93,8 +93,6 @@ function AdminDatatable() {
     }
   }, [page, setPage]);
 
-  // console.log(table.getRowModel().rows.filter((row) => row.getIsSelected()));
-
   return (
     <div className="w-full">
       <div className="flex items-center py-2">
