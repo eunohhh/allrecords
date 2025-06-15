@@ -2,6 +2,7 @@ import {
   QUERY_KEY_ADMIN_RECORDS,
   QUERY_KEY_USER,
 } from "@/constants/allrecords.consts";
+import { formatDateToTZ } from "@/lib/utils";
 import type {
   Record,
   RecordPost,
@@ -38,7 +39,7 @@ export const useAdminRecordsMutation = () => {
 
       const imagesInfo = data.images.map((image) => ({
         id: image.id,
-        description: image.description,
+        desc: image.desc,
       }));
       formData.append("imagesInfo", JSON.stringify(imagesInfo));
 
@@ -69,7 +70,41 @@ export const useAdminRecordsDeleteMutation = () => {
 export const useAdminRecordsPutMutation = () => {
   const queryClient = useQueryClient();
   return useMutation<Record[], Error, { id: string; data: RecordPost }>({
-    mutationFn: ({ id, data }) => putAdminRecords(id, data),
+    mutationFn: ({ id, data }) => {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description);
+      formData.append("category", data.category);
+      formData.append("slug", data.slug);
+      formData.append("created_at", data.created_at);
+      formData.append("updated_at", formatDateToTZ(new Date()));
+
+      const imagesInfo = data.images.map((image) =>
+        image.url
+          ? {
+              id: image.id,
+              desc: image.desc,
+              url: image.url,
+              file: null,
+            }
+          : {
+              id: image.id,
+              desc: image.desc,
+              file: null,
+              url: null,
+            }
+      );
+
+      formData.append("imagesInfo", JSON.stringify(imagesInfo));
+
+      data.images.forEach((image) => {
+        if (image.file) {
+          formData.append("images", image.file);
+        }
+      });
+
+      return putAdminRecords(id, formData);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_RECORDS] });
     },
