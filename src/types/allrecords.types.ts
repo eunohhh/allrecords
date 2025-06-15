@@ -19,9 +19,9 @@ export interface RecordImage {
 
 export interface RecordImagePost {
   id: number;
-  file?: File;
+  file?: File | null;
   url?: string;
-  description: string;
+  desc: string;
 }
 
 export interface RecordPost
