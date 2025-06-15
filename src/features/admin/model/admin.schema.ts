@@ -8,9 +8,9 @@ export const formSchema = z.object({
   images: z.array(
     z.object({
       id: z.number(),
-      file: z.instanceof(File).optional(),
+      file: z.instanceof(File).optional().nullable(),
       url: z.string().optional(),
-      description: z.string(),
+      desc: z.string(),
     })
   ),
 });
