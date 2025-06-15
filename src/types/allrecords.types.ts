@@ -12,13 +12,22 @@ export interface RecordsParams {
 }
 
 export interface RecordImage {
-  id: string;
+  id: number;
   url: string;
-  description: string;
+  desc: string;
 }
 
 export interface RecordImagePost {
   id: number;
-  file: File;
+  file?: File;
+  url?: string;
   description: string;
+}
+
+export interface RecordPost
+  extends Pick<
+    Record,
+    "created_at" | "updated_at" | "title" | "description" | "category" | "slug"
+  > {
+  images: RecordImagePost[];
 }
