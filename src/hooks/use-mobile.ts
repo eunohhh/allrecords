@@ -8,17 +8,25 @@ export function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined") {
+      return;
+    }
 
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    const mediaQueryList = window.matchMedia(
+      `(max-width: ${MOBILE_BREAKPOINT - 1}px)`
+    );
+
+    const handleResize = () => {
+      setIsMobile(mediaQueryList.matches);
     };
 
-    onChange(); // 초기값 설정
-    mql.addEventListener("change", onChange);
+    handleResize();
 
-    return () => mql.removeEventListener("change", onChange);
+    mediaQueryList.addEventListener("change", handleResize);
+
+    return () => {
+      mediaQueryList.removeEventListener("change", handleResize);
+    };
   }, []);
 
   return isMobile;
