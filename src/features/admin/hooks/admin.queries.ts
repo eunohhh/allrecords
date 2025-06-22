@@ -1,9 +1,12 @@
 import {
+  QUERY_KEY_ADMIN_DESCS,
   QUERY_KEY_ADMIN_RECORDS,
   QUERY_KEY_USER,
 } from "@/constants/allrecords.consts";
 import { formatDateToTZ } from "@/lib/utils";
 import type {
+  Desc,
+  DescsParams,
   Record,
   RecordPost,
   RecordsParams,
@@ -11,10 +14,14 @@ import type {
 import type { User } from "@supabase/supabase-js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  deleteAdminDescs,
   deleteAdminRecords,
+  getAdminDescs,
   getAdminRecords,
-  getAdminUser,
+  getUser,
+  postAdminDescs,
   postAdminRecords,
+  putAdminDescs,
   putAdminRecords,
 } from "../apis/admin.apis";
 
@@ -79,21 +86,12 @@ export const useAdminRecordsPutMutation = () => {
       formData.append("created_at", data.created_at);
       formData.append("updated_at", formatDateToTZ(new Date()));
 
-      const imagesInfo = data.images.map((image) =>
-        image.url
-          ? {
-              id: image.id,
-              desc: image.desc,
-              url: image.url,
-              file: null,
-            }
-          : {
-              id: image.id,
-              desc: image.desc,
-              file: null,
-              url: null,
-            }
-      );
+      const imagesInfo = data.images.map((image) => ({
+        id: image.id,
+        desc: image.desc,
+        url: image.url ?? null,
+        file: null,
+      }));
 
       formData.append("imagesInfo", JSON.stringify(imagesInfo));
 
@@ -114,6 +112,44 @@ export const useAdminRecordsPutMutation = () => {
 export const useAdminUserQuery = () => {
   return useQuery<User, Error>({
     queryKey: [QUERY_KEY_USER],
-    queryFn: () => getAdminUser(),
+    queryFn: () => getUser(),
+  });
+};
+
+export const useAdminDescsQuery = (params: DescsParams) => {
+  const queryClient = useQueryClient();
+  return useQuery<Desc[], Error>({
+    queryKey: [QUERY_KEY_ADMIN_DESCS],
+    queryFn: () => getAdminDescs(params),
+  });
+};
+
+export const useAdminDescMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Desc, Error, Desc>({
+    mutationFn: (data) => postAdminDescs(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_DESCS] });
+    },
+  });
+};
+
+export const useAdminDescsDeleteMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Desc[], Error, string[]>({
+    mutationFn: (ids) => deleteAdminDescs({ ids }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_DESCS] });
+    },
+  });
+};
+
+export const useAdminDescsPutMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Desc[], Error, { id: string; data: Desc }>({
+    mutationFn: ({ id, data }) => putAdminDescs(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_DESCS] });
+    },
   });
 };
