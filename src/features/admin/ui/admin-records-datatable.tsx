@@ -51,7 +51,7 @@ const switchColumnIdToKorean = (id: string) => {
   }
 };
 
-function AdminDatatable() {
+function AdminRecordsDatatable() {
   const [page, setPage] = useQueryState("page", parseAsInteger);
   const { category, setSelectedItems } = useAdminStore();
   const { data, isPending, error } = useAdminRecordsQuery({
@@ -199,4 +199,4 @@ function AdminDatatable() {
   );
 }
 
-export default AdminDatatable;
+export default AdminRecordsDatatable;
