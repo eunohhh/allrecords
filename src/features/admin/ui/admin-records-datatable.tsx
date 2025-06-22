@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import Loading from "@/components/ui/loading";
 import {
   Table,
   TableBody,
@@ -31,8 +32,9 @@ import {
 import { ChevronDown, Loader2 } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useAdminRecordsQuery } from "../hooks/admin.queries";
-import { columns } from "../model/admin.columns";
+import { recordsColumns } from "../model/admin.columns";
 import { useAdminStore } from "../model/admin.store";
 import AdminPagination from "./admin-pagination";
 
@@ -53,8 +55,12 @@ const switchColumnIdToKorean = (id: string) => {
 
 function AdminRecordsDatatable() {
   const [page, setPage] = useQueryState("page", parseAsInteger);
-  const { category, setSelectedItems } = useAdminStore();
-  const { data, isPending, error } = useAdminRecordsQuery({
+  const { category } = useAdminStore();
+  const {
+    data: recordsData,
+    isPending,
+    error,
+  } = useAdminRecordsQuery({
     category: category.join(","),
     page: page ?? 1,
     limit: 10,
@@ -68,8 +74,8 @@ function AdminRecordsDatatable() {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const table = useReactTable({
-    data: data ?? [],
-    columns,
+    data: recordsData ?? [],
+    columns: recordsColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -87,10 +93,18 @@ function AdminRecordsDatatable() {
   });
 
   useEffect(() => {
-    if (!page) {
-      setPage(1);
-    }
+    if (page) return;
+    setPage(1);
   }, [page, setPage]);
+
+  useEffect(() => {
+    if (error) {
+      console.error("Error fetching records:", error);
+      toast.error("글 목록 조회에 실패했습니다.");
+    }
+  }, [error]);
+
+  if (isPending) return <Loading type="partial" />;
 
   return (
     <div className="w-full">
@@ -170,7 +184,7 @@ function AdminRecordsDatatable() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={recordsColumns.length}
                   className="h-24 text-center"
                 >
                   <div className="flex items-center justify-center">
@@ -192,6 +206,7 @@ function AdminRecordsDatatable() {
             page={table.getState().pagination.pageIndex + 1}
             limit={table.getState().pagination.pageSize}
             total={table.getFilteredRowModel().rows.length}
+            path="/admin/records"
           />
         </div>
       </div>
