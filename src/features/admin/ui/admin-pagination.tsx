@@ -14,9 +14,10 @@ interface AdminPaginationProps {
   page: number;
   limit: number;
   total: number;
+  path: string;
 }
 
-function AdminPagination({ page, limit, total }: AdminPaginationProps) {
+function AdminPagination({ page, limit, total, path }: AdminPaginationProps) {
   const pageSection = Math.ceil(total / limit);
   const currentPage = page;
   const isFirstPage = currentPage === 1;
@@ -24,12 +25,12 @@ function AdminPagination({ page, limit, total }: AdminPaginationProps) {
 
   const previousPage = () => {
     if (isFirstPage) return;
-    return `/admin/records?page=${currentPage - 1}`;
+    return `${path}?page=${currentPage - 1}`;
   };
 
   const nextPage = () => {
     if (isLastPage) return;
-    return `/admin/records?page=${currentPage + 1}`;
+    return `${path}?page=${currentPage + 1}`;
   };
 
   return (
@@ -46,7 +47,7 @@ function AdminPagination({ page, limit, total }: AdminPaginationProps) {
           return (
             <PaginationItem key={page}>
               <PaginationLink
-                href={`/admin/records?page=${page}`}
+                href={`${path}?page=${page}`}
                 isActive={page === currentPage}
                 className={cn(
                   "cursor-pointer bg-white",
