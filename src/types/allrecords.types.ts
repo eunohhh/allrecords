@@ -33,3 +33,12 @@ export interface RecordPost
 }
 
 export type Desc = Tables<"descs">;
+
+export interface DescsParams {
+  page: number;
+  limit: number;
+  search: string;
+  sort: string;
+  order: string;
+  category: string;
+}
