@@ -2,8 +2,8 @@
 
 import {
   AdminHeader,
-  AdminModal,
   AdminRecordsDatatable,
+  AdminRecordsModal,
 } from "@/features/admin";
 import { useAdminStore } from "@/features/admin/model/admin.store";
 import { useEffect } from "react";
@@ -24,9 +24,9 @@ function AdminRecordsTemplate() {
 
   return (
     <section className="w-full flex flex-col gap-2 pr-4">
-      <AdminHeader />
+      <AdminHeader title="records" />
       <AdminRecordsDatatable />
-      <AdminModal
+      <AdminRecordsModal
         record={selectedItem ?? undefined}
         open={isModalOpen}
         setIsModalOpen={setIsModalOpen}
