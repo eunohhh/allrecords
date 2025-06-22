@@ -49,6 +49,7 @@ export type Database = {
           desc: string
           id: string
           is_select: boolean
+          title: string
           updated_at: string
         }
         Insert: {
@@ -57,6 +58,7 @@ export type Database = {
           desc?: string
           id?: string
           is_select?: boolean
+          title?: string
           updated_at?: string
         }
         Update: {
@@ -65,6 +67,7 @@ export type Database = {
           desc?: string
           id?: string
           is_select?: boolean
+          title?: string
           updated_at?: string
         }
         Relationships: []
