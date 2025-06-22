@@ -42,6 +42,33 @@ export type Database = {
         }
         Relationships: []
       }
+      descs: {
+        Row: {
+          category: string
+          created_at: string
+          desc: string
+          id: string
+          is_select: boolean
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          desc?: string
+          id?: string
+          is_select?: boolean
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          desc?: string
+          id?: string
+          is_select?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
