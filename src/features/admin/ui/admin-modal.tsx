@@ -18,6 +18,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { formatDateToTZ } from "@/lib/utils";
 import type {
   Record,
@@ -153,21 +154,12 @@ function AdminModal({ open, setIsModalOpen, record }: AdminModalProps) {
       ...data,
       created_at: formatDateToTZ(now),
       updated_at: formatDateToTZ(now),
-      images: data.images.map((image) =>
-        image.file
-          ? {
-              id: image.id,
-              file: image.file,
-              url: "",
-              desc: image.desc,
-            }
-          : {
-              id: image.id,
-              url: image.url,
-              file: null,
-              desc: image.desc,
-            }
-      ),
+      images: data.images.map((image) => ({
+        id: image.id,
+        url: image.file ? "" : image.url,
+        file: image.file ? image.file : null,
+        desc: image.desc,
+      })),
     };
     console.log("New record:", newRecord);
     if (record) {
@@ -231,10 +223,17 @@ function AdminModal({ open, setIsModalOpen, record }: AdminModalProps) {
                       <FormItem>
                         <FormLabel>{input.label}</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder={`${input.label}을 입력해주세요.`}
-                            {...field}
-                          />
+                          {input.name === "description" ? (
+                            <Textarea
+                              placeholder={`${input.label}을 입력해주세요.`}
+                              {...field}
+                            />
+                          ) : (
+                            <Input
+                              placeholder={`${input.label}을 입력해주세요.`}
+                              {...field}
+                            />
+                          )}
                         </FormControl>
                       </FormItem>
                     )}
