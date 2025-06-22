@@ -96,11 +96,11 @@ function AdminImageModal({
               <img
                 src={image.url || URL.createObjectURL(image.file!)}
                 alt="이미지"
-                className="h-40 w-40 object-cover"
+                className="h-40 w-40 object-cover rounded-sm"
               />
               <Button
                 variant="secondary"
-                className="absolute right-0 top-0 h-5 w-5 cursor-pointer"
+                className="absolute right-0 top-0 h-5 w-5 cursor-pointer has-[>svg]:px-2"
                 onClick={handleImageDeleteButtonClick}
               >
                 <X />
