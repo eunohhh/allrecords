@@ -1,6 +1,10 @@
 "use client";
 
-import { AdminDatatable, AdminHeader, AdminModal } from "@/features/admin";
+import {
+  AdminHeader,
+  AdminModal,
+  AdminRecordsDatatable,
+} from "@/features/admin";
 import { useAdminStore } from "@/features/admin/model/admin.store";
 import { useEffect } from "react";
 import { useShallow } from "zustand/react/shallow";
@@ -21,7 +25,7 @@ function AdminRecordsTemplate() {
   return (
     <section className="w-full flex flex-col gap-2 pr-4">
       <AdminHeader />
-      <AdminDatatable />
+      <AdminRecordsDatatable />
       <AdminModal
         record={selectedItem ?? undefined}
         open={isModalOpen}
