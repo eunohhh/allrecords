@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
     .select();
 
   if (error) {
+    console.error("Error deleting records:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
