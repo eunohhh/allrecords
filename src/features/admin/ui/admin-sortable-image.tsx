@@ -32,7 +32,7 @@ function AdminSortableImage({ image, onDelete }: AdminSortableImageProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className="relative flex h-20 w-20 items-center justify-center rounded-md border border-gray-200 p-0 sm:h-30 sm:w-30 md:h-40 md:w-40"
+      className="relative flex h-20 w-20 items-center justify-center border border-gray-200 p-0 sm:h-30 sm:w-30 md:h-40 md:w-40"
     >
       <div
         {...attributes}
@@ -42,11 +42,11 @@ function AdminSortableImage({ image, onDelete }: AdminSortableImageProps) {
       <img
         src={imageSrc}
         alt={image.desc}
-        className="h-full w-full object-cover"
+        className="h-full w-full object-cover rounded-sm"
       />
       <Button
         variant="secondary"
-        className="absolute right-0 top-0 h-4 w-4 p-0 cursor-pointer z-10"
+        className="absolute right-0 top-0 h-4 w-4 p-0 cursor-pointer z-10 has-[>svg]:px-2"
         onClick={handleDelete}
       >
         <X />
