@@ -1,9 +1,11 @@
+export { default as AdminAboutDatatable } from "./ui/admin-about-datatable";
+export { default as AdminDescModal } from "./ui/admin-desc-modal";
 export { default as AdminHeader } from "./ui/admin-header";
 export { default as AdminImageModal } from "./ui/admin-image-modal";
 export { default as AdminLoginButton } from "./ui/admin-login-button";
-export { default as AdminModal } from "./ui/admin-modal";
 export { default as AdminPagination } from "./ui/admin-pagination";
 export { default as AdminRecordsDatatable } from "./ui/admin-records-datatable";
+export { default as AdminRecordsModal } from "./ui/admin-records-modal";
 export { default as AdminSelect } from "./ui/admin-select";
 export { default as AdminSidebar } from "./ui/admin-sidebar";
 export { default as AdminSortableImage } from "./ui/admin-sortable-image";
