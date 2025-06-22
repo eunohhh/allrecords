@@ -31,3 +31,5 @@ export interface RecordPost
   > {
   images: RecordImagePost[];
 }
+
+export type Desc = Tables<"descs">;
