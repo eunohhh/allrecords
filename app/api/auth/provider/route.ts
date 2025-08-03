@@ -26,6 +26,9 @@ export async function GET(request: NextRequest) {
     provider: provider as Provider,
     options: {
       redirectTo: `${getURL()}/api/auth/callback?next=${next}`,
+      queryParams: {
+        scope: "account_email profile_image profile_nickname talk_message",
+      },
     },
   });
 
