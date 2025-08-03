@@ -78,7 +78,13 @@ function AdminSidebar({ user }: AdminSidebarProps) {
                 <DropdownMenuItem>
                   <span>{user?.user_metadata.name}</span>
                 </DropdownMenuItem>
-                <Link href="/api/auth/logout">
+                <Link
+                  href="/api/auth/logout"
+                  onClick={() => {
+                    localStorage.removeItem("kakao_provider_token");
+                    localStorage.removeItem("kakao_provider_refresh_token");
+                  }}
+                >
                   <DropdownMenuItem className="cursor-pointer">
                     <span>로그아웃</span>
                   </DropdownMenuItem>
