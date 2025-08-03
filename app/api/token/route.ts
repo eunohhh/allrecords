@@ -1,9 +1,11 @@
+import { EUN_MAIL } from "@/constants/allrecords.consts";
 import { createClient } from "@/lib/supabase/server";
 import { type NextRequest, NextResponse } from "next/server";
 
 interface TokenRequest {
   token: string;
   refresh_token: string;
+  user_email: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -16,7 +18,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { token, refresh_token } = (await request.json()) as TokenRequest;
+  const { token, refresh_token, user_email } =
+    (await request.json()) as TokenRequest;
+
+  if (user_email !== EUN_MAIL) {
+    return NextResponse.json(
+      { error: "토큰 요청 권한이 없는 사용자 입니다" },
+      { status: 401 }
+    );
+  }
 
   const supabase = await createClient();
 
@@ -35,5 +45,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data, { status: 200 });
+  return NextResponse.json({ message: "success" }, { status: 200 });
 }
