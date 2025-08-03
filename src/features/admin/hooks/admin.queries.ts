@@ -10,7 +10,6 @@ import type {
   Record,
   RecordPost,
   RecordsParams,
-  Token,
 } from "@/types/allrecords.types";
 import type { User } from "@supabase/supabase-js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -112,14 +111,13 @@ export const useAdminRecordsPutMutation = () => {
 };
 
 export const useAdminUserQuery = () => {
-  return useQuery<{ user: User }, Error>({
+  return useQuery<User, Error>({
     queryKey: [QUERY_KEY_USER],
     queryFn: () => getUser(),
   });
 };
 
 export const useAdminDescsQuery = (params: DescsParams) => {
-  const queryClient = useQueryClient();
   return useQuery<Desc[], Error>({
     queryKey: [QUERY_KEY_ADMIN_DESCS],
     queryFn: () => getAdminDescs(params),
@@ -157,7 +155,7 @@ export const useAdminDescsPutMutation = () => {
 };
 
 export const useAdminTokenMutation = () => {
-  return useMutation<Token, Error, void>({
-    mutationFn: () => postAdminToken(),
+  return useMutation<{ message: string }, Error, User>({
+    mutationFn: (user) => postAdminToken(user),
   });
 };
