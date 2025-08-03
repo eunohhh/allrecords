@@ -4,6 +4,7 @@ import type {
   DescsParams,
   Record,
   RecordsParams,
+  Token,
 } from "@/types/allrecords.types";
 import type { User } from "@supabase/supabase-js";
 
@@ -24,7 +25,7 @@ export function putAdminRecords(id: string, formData: FormData) {
 }
 
 export function getUser() {
-  return api.get<User, User>("/api/auth/user");
+  return api.get<{ user: User }, { user: User }>("/api/auth/user");
 }
 
 export function getAdminDescs(params: DescsParams) {
@@ -41,4 +42,20 @@ export function deleteAdminDescs(params: { ids: string[] }) {
 
 export function putAdminDescs(id: string, data: Desc) {
   return api.put<Desc[], Desc[]>(`/api/descs/${id}`, data);
+}
+
+export function postAdminToken() {
+  const providerToken = localStorage.getItem("kakao_provider_token");
+  const providerRefreshToken = localStorage.getItem(
+    "kakao_provider_refresh_token"
+  );
+
+  if (!providerToken || !providerRefreshToken) {
+    throw new Error("Kakao token not found");
+  }
+
+  return api.post<Token, Token>("/api/token", {
+    token: providerToken,
+    refresh_token: providerRefreshToken,
+  });
 }
