@@ -20,8 +20,8 @@ function AdminTemplate() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("event ===>", event);
-      console.log("session ===>", session);
+      // console.log("event ===>", event);
+      // console.log("session ===>", session);
       if (
         (event === "SIGNED_IN" ||
           event === "TOKEN_REFRESHED" ||
@@ -48,13 +48,14 @@ function AdminTemplate() {
   }, [supabase]);
 
   useEffect(() => {
-    if (isToken) postAdminToken();
-  }, [isToken, postAdminToken]);
+    if (!user) return;
+    if (isToken) postAdminToken(user);
+  }, [isToken, postAdminToken, user]);
 
   return (
     <div>
       admin-template
-      <div>{user?.user?.user_metadata.email}님 안녕하세요!</div>
+      <div>{user?.user_metadata.email}님 안녕하세요!</div>
     </div>
   );
 }
