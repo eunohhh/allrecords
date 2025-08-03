@@ -185,39 +185,53 @@ ${message}
 
     const { token, refresh_token } = tokens;
 
-    const tokenHealthCheckResponse: AxiosResponse<HealthCheckResponse> =
-      await kakaoKapi.get("/v1/user/access_token_info", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-    if (tokenHealthCheckResponse.status !== 200) {
-      return NextResponse.json(
-        { error: "Failed to check token health" },
-        { status: 500 }
-      );
-    }
-    if (!tokenHealthCheckResponse.data) {
-      return NextResponse.json(
-        { error: "Failed to check token health" },
-        { status: 500 }
-      );
-    }
-
     // 사용할 액세스 토큰 결정
     let accessToken = token;
+    let shouldRefreshToken = false;
 
-    // expires_in 이 1분 이하인 경우 토큰 갱신
-    if (tokenHealthCheckResponse.data.expires_in < 60) {
-      const refreshRequestData = {
+    // 토큰 헬스체크 시도
+    try {
+      const tokenHealthCheckResponse: AxiosResponse<HealthCheckResponse> =
+        await kakaoKapi.get("/v1/user/access_token_info", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+      if (
+        tokenHealthCheckResponse.status === 200 &&
+        tokenHealthCheckResponse.data
+      ) {
+        // expires_in 이 1분 이하인 경우 토큰 갱신 필요
+        if (tokenHealthCheckResponse.data.expires_in < 60) {
+          shouldRefreshToken = true;
+        }
+      } else {
+        shouldRefreshToken = true;
+      }
+    } catch (error: any) {
+      // 401 에러 (토큰 만료) 또는 기타 에러 발생 시 토큰 갱신 시도
+      console.log(
+        "Token health check failed, attempting refresh:",
+        error.response?.status
+      );
+      shouldRefreshToken = true;
+    }
+
+    // 토큰 갱신이 필요한 경우
+    if (shouldRefreshToken) {
+      const refreshRequestData = new URLSearchParams({
         grant_type: "refresh_token",
         client_id: kakaoClientId,
         refresh_token: refresh_token,
-      };
+      });
 
       const refreshTokenResponse: AxiosResponse<RefreshTokenResponse> =
-        await kakaoAuthApi.post("/oauth/token", refreshRequestData);
+        await kakaoAuthApi.post("/oauth/token", refreshRequestData, {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+          },
+        });
 
       if (refreshTokenResponse.status !== 200) {
         return NextResponse.json(
@@ -293,6 +307,8 @@ ${message}
       templateObject
     );
 
+    // console.log("messageResponse ===>", messageResponse);
+
     // 실패시 재시도
     if (messageResponse.status !== 200) {
       return retrySendMessageAndReturnException(
@@ -304,15 +320,6 @@ ${message}
 
     // 실패시 재시도
     if (!messageResponse.data) {
-      return retrySendMessageAndReturnException(
-        kakaoKapi,
-        accessToken,
-        templateObject
-      );
-    }
-
-    // 실패시 재시도
-    if (messageResponse.data.result_code !== 0) {
       return retrySendMessageAndReturnException(
         kakaoKapi,
         accessToken,
@@ -365,5 +372,14 @@ ${message}
 //   return NextResponse.json(
 //     { error: "Failed to send message" },
 //     { status: 500 }
+//   );
+// }
+
+// 실패시 재시도
+//  if (messageResponse.data.result_code !== 0) {
+//   return retrySendMessageAndReturnException(
+//     kakaoKapi,
+//     accessToken,
+//     templateObject
 //   );
 // }
