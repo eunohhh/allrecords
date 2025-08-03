@@ -1,31 +1,129 @@
 import { PUBLIC_URL } from "@/constants/allrecords.consts";
 import { createClient } from "@/lib/supabase/server";
-import axios, { type AxiosResponse } from "axios";
+import type {
+  HealthCheckResponse,
+  KakaoFriendListResponse,
+  MessageRequest,
+  MessageResponse,
+  RefreshTokenResponse,
+  TemplateObject,
+} from "@/types/allrecords.types";
+import axios, { type AxiosInstance, type AxiosResponse } from "axios";
 import { type NextRequest, NextResponse } from "next/server";
 
-interface HealthCheckResponse {
-  id: string;
-  expires_in: number;
-  app_id: number;
-}
-
-interface RefreshTokenResponse {
-  token_type: string;
-  access_token: string;
-  id_token?: string;
-  expires_in: number;
-  refresh_token?: string;
-  refresh_token_expires_in?: number;
-}
-
-interface MessageResponse {
-  result_code: number;
-}
+const misunUUId = process.env.MISUN_UUID;
 
 const url =
   PUBLIC_URL ?? // Set this to your site URL in production env.
   process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
   "http://localhost:3000/";
+
+const sendMessage = async (
+  kakaoKapi: AxiosInstance,
+  accessToken: string,
+  uuid: string,
+  templateObject: TemplateObject
+) => {
+  const body = new URLSearchParams({
+    template_object: JSON.stringify(templateObject),
+    receiver_uuids: JSON.stringify([uuid]),
+  });
+
+  //친구에게 카카오 메시지 전송
+  const messageResponse: AxiosResponse<MessageResponse> = await kakaoKapi.post(
+    "/v1/api/talk/friends/message/default/send",
+    body,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+      },
+    }
+  );
+
+  return messageResponse;
+};
+
+const getKakaoFriendList = async (
+  kakaoKapi: AxiosInstance,
+  accessToken: string
+) => {
+  // 카카오 친구목록 조회하여 즐겨찾기 첫번째 대상 찾기
+  const kakaoFriendListResponse: AxiosResponse<KakaoFriendListResponse> =
+    await kakaoKapi.get("/v1/api/talk/friends", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+  return kakaoFriendListResponse;
+};
+
+const getUUId = (
+  kakaoFriendListResponse: AxiosResponse<KakaoFriendListResponse>
+) => {
+  if (kakaoFriendListResponse.status !== 200) return null;
+  if (!kakaoFriendListResponse.data) return null;
+
+  const { elements } = kakaoFriendListResponse.data;
+  if (!elements) return null;
+
+  return elements[0].uuid;
+};
+
+const retrySendMessage = async (
+  kakaoKapi: AxiosInstance,
+  accessToken: string,
+  templateObject: MessageRequest["template_object"]
+) => {
+  // 만약 misunUUId 가 없으면 즐겨찾기 첫번째 대상 찾기
+  const kakaoFriendListResponse = await getKakaoFriendList(
+    kakaoKapi,
+    accessToken
+  );
+  const uuid = getUUId(kakaoFriendListResponse);
+  if (!uuid) return null;
+
+  const messageResponse = await sendMessage(
+    kakaoKapi,
+    accessToken,
+    uuid,
+    templateObject
+  );
+
+  return messageResponse;
+};
+
+const retrySendMessageAndReturnException = async (
+  kakaoKapi: AxiosInstance,
+  accessToken: string,
+  templateObject: MessageRequest["template_object"]
+) => {
+  const retryMessageResponse = await retrySendMessage(
+    kakaoKapi,
+    accessToken,
+    templateObject
+  );
+
+  if (retryMessageResponse === null) {
+    return NextResponse.json(
+      { error: "Failed to get kakao friend list" },
+      { status: 500 }
+    );
+  }
+
+  if (retryMessageResponse.status !== 200) {
+    return NextResponse.json(
+      { error: "Failed to send message" },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json(
+    { message: "Message sent successfully" },
+    { status: 200 }
+  );
+};
 
 export async function POST(req: NextRequest) {
   const kakaoClientId = process.env.KAKAO_REST_API_KEY;
@@ -42,6 +140,13 @@ export async function POST(req: NextRequest) {
   const email = formData.get("email");
   const message = formData.get("message");
 
+  if (!name || !email || !message) {
+    return NextResponse.json(
+      { error: "Missing required fields" },
+      { status: 400 }
+    );
+  }
+
   const kakaoKapi = axios.create({
     baseURL: "https://kapi.kakao.com",
   });
@@ -50,14 +155,7 @@ export async function POST(req: NextRequest) {
     baseURL: "https://kauth.kakao.com",
   });
 
-  if (!name || !email || !message) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
-  }
-
-  const templateObject = {
+  const templateObject: MessageRequest["template_object"] = {
     object_type: "text",
     text: `🔔 새로운 문의가 도착했습니다!
 
@@ -71,10 +169,6 @@ ${message}
       web_url: url,
     },
   };
-
-  const requestTemplateObject = new URLSearchParams({
-    template_object: JSON.stringify(templateObject),
-  });
 
   const supabase = await createClient();
 
@@ -183,37 +277,46 @@ ${message}
       accessToken = access_token;
     }
 
-    // 카카오 메시지 전송
-    const messageResponse: AxiosResponse<MessageResponse> =
-      await kakaoKapi.post(
-        "/v2/api/talk/memo/default/send",
-        requestTemplateObject,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-          },
-        }
+    // env 에 misunUUId 가 없으면 예외 발생
+    if (!misunUUId) {
+      return NextResponse.json(
+        { message: "Misun UUID is not set" },
+        { status: 400 }
       );
+    }
 
+    // env 에 있는 misunUUId 가 있으면 우선 메시지 전송 시도
+    const messageResponse = await sendMessage(
+      kakaoKapi,
+      accessToken,
+      misunUUId,
+      templateObject
+    );
+
+    // 실패시 재시도
     if (messageResponse.status !== 200) {
-      return NextResponse.json(
-        { error: "Failed to send message" },
-        { status: 500 }
+      return retrySendMessageAndReturnException(
+        kakaoKapi,
+        accessToken,
+        templateObject
       );
     }
 
+    // 실패시 재시도
     if (!messageResponse.data) {
-      return NextResponse.json(
-        { error: "Failed to send message" },
-        { status: 500 }
+      return retrySendMessageAndReturnException(
+        kakaoKapi,
+        accessToken,
+        templateObject
       );
     }
 
+    // 실패시 재시도
     if (messageResponse.data.result_code !== 0) {
-      return NextResponse.json(
-        { error: "Failed to send message" },
-        { status: 500 }
+      return retrySendMessageAndReturnException(
+        kakaoKapi,
+        accessToken,
+        templateObject
       );
     }
 
@@ -230,3 +333,37 @@ ${message}
     );
   }
 }
+
+// 카카오 메시지 전송
+// const messageResponse: AxiosResponse<MessageResponse> =
+//   await kakaoKapi.post(
+//     "/v2/api/talk/memo/default/send",
+//     requestTemplateObject,
+//     {
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//         "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+//       },
+//     }
+//   );
+
+// if (messageResponse.status !== 200) {
+//   return NextResponse.json(
+//     { error: "Failed to send message" },
+//     { status: 500 }
+//   );
+// }
+
+// if (!messageResponse.data) {
+//   return NextResponse.json(
+//     { error: "Failed to send message" },
+//     { status: 500 }
+//   );
+// }
+
+// if (messageResponse.data.result_code !== 0) {
+//   return NextResponse.json(
+//     { error: "Failed to send message" },
+//     { status: 500 }
+//   );
+// }
