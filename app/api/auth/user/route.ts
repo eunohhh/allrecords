@@ -10,5 +10,5 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(user, { status: 200 });
+  return NextResponse.json(user.user, { status: 200 });
 }
