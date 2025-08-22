@@ -40,8 +40,8 @@ export const useAdminRecordsMutation = () => {
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("description", data.description);
-      formData.append("category", data.category);
-      formData.append("slug", data.slug);
+      if (data.category) formData.append("category", data.category);
+      if (data.slug) formData.append("slug", data.slug);
       formData.append("created_at", data.created_at);
       formData.append("updated_at", data.updated_at);
 
@@ -82,8 +82,8 @@ export const useAdminRecordsPutMutation = () => {
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("description", data.description);
-      formData.append("category", data.category);
-      formData.append("slug", data.slug);
+      if (data.category) formData.append("category", data.category);
+      if (data.slug) formData.append("slug", data.slug);
       formData.append("created_at", data.created_at);
       formData.append("updated_at", formatDateToTZ(new Date()));
 
