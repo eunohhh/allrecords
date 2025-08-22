@@ -2,7 +2,7 @@ import type { Category, Desc, Record } from "@/types/allrecords.types";
 import { create } from "zustand";
 
 interface AdminStore {
-  category: string[];
+  category: Category[];
   setCategory: (category: Category[]) => void;
   aboutCategory: string[];
   setAboutCategory: (aboutCategory: string[]) => void;
@@ -21,7 +21,7 @@ interface AdminStore {
 }
 
 export const useAdminStore = create<AdminStore>((set) => ({
-  category: ["ilsang", "poolsoop", "grim"],
+  category: ["ilsang", "poolsoop", "grim"] as Category[],
   setCategory: (category) => set({ category }),
   aboutCategory: ["about"],
   setAboutCategory: (aboutCategory) => set({ aboutCategory }),

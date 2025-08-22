@@ -1,5 +1,5 @@
-import type { Database, Tables } from "@/types/supabase";
 import { z } from "zod";
+import type { Database, Tables } from "@/types/supabase";
 
 export type Record = Tables<"allrecords">;
 
@@ -9,7 +9,7 @@ export interface RecordsParams {
   search: string;
   sort: string;
   order: string;
-  category: Category;
+  category: string;
 }
 
 export interface RecordImage {

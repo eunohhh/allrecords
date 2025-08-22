@@ -67,7 +67,7 @@ const inputNames: {
 const defaultValues = {
   title: "",
   description: "",
-  category: "",
+  category: [] as ("poolsoop" | "ilsang" | "grim")[],
   slug: "",
   images: [],
 };
@@ -108,7 +108,7 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
     defaultValues: {
       title: record?.title || "",
       description: record?.description || "",
-      category: record?.category || "",
+      category: record?.category ? [record.category] : [],
       slug: record?.slug || "",
       images: (record?.images as unknown as RecordImagePost[]) || [],
     },
@@ -152,6 +152,7 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
     const now = new Date();
     const newRecord: RecordPost = {
       ...data,
+      category: data.category[0] || null,
       created_at: formatDateToTZ(now),
       updated_at: formatDateToTZ(now),
       images: data.images.map((image) => ({
@@ -182,7 +183,7 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
     form.reset({
       title: record.title,
       description: record.description,
-      category: record.category,
+      category: record.category ? [record.category] : [],
       slug: record.slug,
       images,
     });

@@ -1,3 +1,5 @@
+import { type NextRequest, NextResponse } from "next/server";
+import sharp from "sharp";
 import { createClient } from "@/lib/supabase/server";
 import type {
   Category,
@@ -6,8 +8,6 @@ import type {
   RecordImagePost,
 } from "@/types/allrecords.types";
 import type { Json } from "@/types/supabase";
-import { type NextRequest, NextResponse } from "next/server";
-import sharp from "sharp";
 
 interface GetRecordParams {
   params: Promise<{ slug: string }>;

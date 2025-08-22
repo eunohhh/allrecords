@@ -7,22 +7,18 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": [
-			"node_modules",
-			"dist",
-			"build",
-			"public",
-			".next",
-			"src/components/ui"
+		"includes": [
+			"!node_modules",
+			"!.next",
+			"!dist",
+			"!build",
+			"!public"
 		]
 	},
 	"formatter": {
 		"enabled": true,
 		"indentStyle": "space",
 		"indentWidth": 2
-	},
-	"organizeImports": {
-		"enabled": true
 	},
 	"linter": {
 		"enabled": true,

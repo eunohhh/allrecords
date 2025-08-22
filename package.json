@@ -9,7 +9,7 @@
     "lint": "pnpm biome lint",
     "prepare": "husky",
     "format": "pnpm biome format",
-    "genTypes": "supabase gen types typescript --project-id \"htjzfdsizwacysfiwjcd\" --schema public > src/types/supabase.ts"
+    "genTypes": "supabase gen types typescript --project-id \"htjzfdsizwacysfiwjcd\" --schema public > src/types/supabase.ts && node scripts/fix-supabase-types.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -43,7 +43,7 @@
     "@radix-ui/react-toggle-group": "^1.1.10",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.50.0",
+    "@supabase/supabase-js": "2.55.0",
     "@tanstack/react-query": "^5.80.6",
     "@tanstack/react-query-devtools": "^5.80.6",
     "@tanstack/react-table": "^8.21.3",
@@ -84,5 +84,6 @@
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.4",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1"
 }

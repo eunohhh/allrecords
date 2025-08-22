@@ -7,6 +7,6 @@ interface HomeStore {
 }
 
 export const useHomeStore = create<HomeStore>((set) => ({
-  category: ["ilsang", "poolsoop", "grim"],
+  category: ["ilsang", "poolsoop", "grim"] as Category[],
   setCategory: (category) => set({ category }),
 }));

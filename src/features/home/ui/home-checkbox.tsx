@@ -8,7 +8,7 @@ import { useHomeStore } from "../model/home.store";
 
 interface HomeCheckboxProps {
   label: string;
-  id: string;
+  id: "poolsoop" | "ilsang" | "grim";
 }
 
 function HomeCheckbox({ label, id }: HomeCheckboxProps) {

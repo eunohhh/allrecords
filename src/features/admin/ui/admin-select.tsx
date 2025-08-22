@@ -20,7 +20,10 @@ interface AdminSelectProps {
 
 function AdminSelect({ field }: AdminSelectProps) {
   return (
-    <Select value={field.value} onValueChange={field.onChange}>
+    <Select
+      value={field.value[0] || ""}
+      onValueChange={(value) => field.onChange([value])}
+    >
       <SelectTrigger className="w-full">
         <SelectValue placeholder="카테고리를 선택해주세요." />
       </SelectTrigger>
