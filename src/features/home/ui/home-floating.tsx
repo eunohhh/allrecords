@@ -5,13 +5,13 @@ import Link from "next/link";
 
 function HomeFloating() {
   return (
-    <div className="fixed bottom-0 right-2">
+    <div className="fixed right-2 bottom-0">
       <Link href="/about">
         <Button
           type="button"
-          className="p-0 bg-transparent hover:bg-transparent cursor-pointer"
+          className="cursor-pointer bg-transparent p-0 hover:bg-transparent"
         >
-          <div className="w-14 h-14 bg-blue-500 rounded-full hover:bg-blue-800" />
+          <div className="h-14 w-14 rounded-full bg-blue-500 hover:bg-blue-800" />
         </Button>
       </Link>
     </div>

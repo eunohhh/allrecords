@@ -22,7 +22,7 @@ function AboutText() {
       {isPending ? (
         <Loading type="partial" />
       ) : (
-        <p className="text-xl font-bold">{about?.desc}</p>
+        <p className="font-bold text-xl">{about?.desc}</p>
       )}
     </div>
   );

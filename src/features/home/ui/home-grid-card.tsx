@@ -10,7 +10,7 @@ interface HomeGridCardProps {
 function HomeGridCard({ record }: HomeGridCardProps) {
   return (
     <Link href={`/${record.slug}`}>
-      <div className="bg-green-500 rounded-lg py-12 px-2">
+      <div className="rounded-lg bg-green-500 px-2 py-12">
         <h2>{record.title}</h2>
         <p>{record.slug}</p>
       </div>

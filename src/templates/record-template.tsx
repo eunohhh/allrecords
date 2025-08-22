@@ -13,7 +13,7 @@ function RecordTemplate({ slug }: RecordTemplateProps) {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <main className="flex flex-col h-svh px-2">
+    <main className="flex h-svh flex-col px-2">
       <RecordHeader record={record} />
       <RecordImages recordImages={record.images} />
     </main>

@@ -208,8 +208,8 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       {isCreating || isUpdating ? (
-        <div className="flex items-center justify-center h-full">
-          <Loader2 className="w-4 h-4 animate-spin" />
+        <div className="flex h-full items-center justify-center">
+          <Loader2 className="h-4 w-4 animate-spin" />
         </div>
       ) : (
         <>
@@ -272,7 +272,7 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
                   </div>
 
                   {fields.length > 0 && (
-                    <div className="grid grid-cols-4 place-items-center gap-2 rounded-md border border-gray-300 py-2 px-1">
+                    <div className="grid grid-cols-4 place-items-center gap-2 rounded-md border border-gray-300 px-1 py-2">
                       <DndContext
                         sensors={sensors}
                         collisionDetection={closestCenter}

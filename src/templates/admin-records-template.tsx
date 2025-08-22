@@ -23,7 +23,7 @@ function AdminRecordsTemplate() {
   }, [selectedItem, setIsModalOpen]);
 
   return (
-    <section className="w-full flex flex-col gap-2 pr-4">
+    <section className="flex w-full flex-col gap-2 pr-4">
       <AdminHeader title="records" />
       <AdminRecordsDatatable />
       <AdminRecordsModal

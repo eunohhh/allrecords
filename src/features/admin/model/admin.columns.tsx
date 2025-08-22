@@ -129,14 +129,14 @@ export const recordsColumns: ColumnDef<Record>[] = [
         <div>
           <Button
             variant="ghost"
-            className="h-8 w-8 p-0 cursor-pointer"
+            className="h-8 w-8 cursor-pointer p-0"
             onClick={handleDeleteRecord}
           >
             <Trash2 />
           </Button>
           <Button
             variant="ghost"
-            className="h-8 w-8 p-0 cursor-pointer"
+            className="h-8 w-8 cursor-pointer p-0"
             onClick={() => {
               setSelectedItem(record);
             }}
@@ -262,14 +262,14 @@ export const aboutColumns: ColumnDef<Desc>[] = [
         <div>
           <Button
             variant="ghost"
-            className="h-8 w-8 p-0 cursor-pointer"
+            className="h-8 w-8 cursor-pointer p-0"
             onClick={handleDeleteDesc}
           >
             <Trash2 />
           </Button>
           <Button
             variant="ghost"
-            className="h-8 w-8 p-0 cursor-pointer"
+            className="h-8 w-8 cursor-pointer p-0"
             onClick={() => {
               setSelectedDesc(record);
             }}

@@ -11,7 +11,7 @@ function AdminHeader({ title }: AdminHeaderProps) {
   return (
     <>
       <div className="flex items-center justify-between pt-2">
-        <h1 className="flex items-center justify-start pl-2 text-lg font-bold">
+        <h1 className="flex items-center justify-start pl-2 font-bold text-lg">
           {title === "descs" ? "about" : title}
         </h1>
         <div className="flex items-center justify-end gap-2">

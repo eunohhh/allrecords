@@ -32,7 +32,7 @@ function HomeGrid() {
 
   return (
     <section className="flex flex-col gap-2">
-      <div className="flex flex-row gap-2 justify-end">
+      <div className="flex flex-row justify-end gap-2">
         {CHECKBOX_CATEGORY.map((category) => (
           <HomeCheckbox
             key={category.id}
@@ -41,9 +41,9 @@ function HomeGrid() {
           />
         ))}
       </div>
-      <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+      <div className="grid grid-cols-4 gap-4 md:grid-cols-6 lg:grid-cols-8">
         {isPending && (
-          <Skeleton className="min-w-10 min-h-30 rounded-lg bg-gray-400" />
+          <Skeleton className="min-h-30 min-w-10 rounded-lg bg-gray-400" />
         )}
         {allRecords
           ? allRecords.map((record) => (

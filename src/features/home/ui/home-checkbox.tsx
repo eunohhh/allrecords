@@ -25,7 +25,7 @@ function HomeCheckbox({ label, id }: HomeCheckboxProps) {
   };
 
   return (
-    <div className="flex items-center justify-center gap-1 min-w-16">
+    <div className="flex min-w-16 items-center justify-center gap-1">
       <Checkbox id={id} checked={checked} onCheckedChange={handleChange} />
       <Label htmlFor={id}>{label}</Label>
     </div>
