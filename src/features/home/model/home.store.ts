@@ -1,11 +1,12 @@
+import type { Category } from "@/types/allrecords.types";
 import { create } from "zustand";
 
 interface HomeStore {
-  category: string[];
-  setCategory: (category: string[]) => void;
+  category: Category[];
+  setCategory: (category: Category[]) => void;
 }
 
 export const useHomeStore = create<HomeStore>((set) => ({
-  category: ["daily", "hosoop", "work"],
+  category: ["ilsang", "poolsoop", "grim"] as Category[],
   setCategory: (category) => set({ category }),
 }));

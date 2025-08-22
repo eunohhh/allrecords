@@ -4,9 +4,9 @@ import { HomeFloating, HomeGrid } from "@/features/home";
 
 function HomeTemplate() {
   return (
-    <main className="flex flex-col h-svh px-2">
+    <main className="flex h-svh flex-col px-2">
       <div className="flex flex-col gap-4 pb-4">
-        <h1 className="text-4xl font-bold">allrecords.me</h1>
+        <h1 className="font-bold text-4xl">allrecords.me</h1>
       </div>
       <HomeGrid />
       <HomeFloating />

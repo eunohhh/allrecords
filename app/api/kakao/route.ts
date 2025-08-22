@@ -272,6 +272,7 @@ ${message}
         .from("token")
         .update({ token: access_token, refresh_token: newRefreshToken })
         .eq("id", oldestToken[0].id)
+        .select()
         .single();
 
       if (updateTokenError) {
@@ -340,46 +341,3 @@ ${message}
     );
   }
 }
-
-// 카카오 메시지 전송
-// const messageResponse: AxiosResponse<MessageResponse> =
-//   await kakaoKapi.post(
-//     "/v2/api/talk/memo/default/send",
-//     requestTemplateObject,
-//     {
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//         "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-//       },
-//     }
-//   );
-
-// if (messageResponse.status !== 200) {
-//   return NextResponse.json(
-//     { error: "Failed to send message" },
-//     { status: 500 }
-//   );
-// }
-
-// if (!messageResponse.data) {
-//   return NextResponse.json(
-//     { error: "Failed to send message" },
-//     { status: 500 }
-//   );
-// }
-
-// if (messageResponse.data.result_code !== 0) {
-//   return NextResponse.json(
-//     { error: "Failed to send message" },
-//     { status: 500 }
-//   );
-// }
-
-// 실패시 재시도
-//  if (messageResponse.data.result_code !== 0) {
-//   return retrySendMessageAndReturnException(
-//     kakaoKapi,
-//     accessToken,
-//     templateObject
-//   );
-// }

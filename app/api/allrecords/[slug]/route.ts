@@ -1,12 +1,13 @@
+import { type NextRequest, NextResponse } from "next/server";
+import sharp from "sharp";
 import { createClient } from "@/lib/supabase/server";
 import type {
+  Category,
   Record,
   RecordImage,
   RecordImagePost,
 } from "@/types/allrecords.types";
 import type { Json } from "@/types/supabase";
-import { type NextRequest, NextResponse } from "next/server";
-import sharp from "sharp";
 
 interface GetRecordParams {
   params: Promise<{ slug: string }>;
@@ -93,7 +94,7 @@ export async function PUT(
     id,
     title: formData.get("title") as string,
     description: formData.get("description") as string,
-    category: formData.get("category") as string,
+    category: formData.get("category") as Category,
     slug: formData.get("slug") as string,
     created_at: formData.get("created_at") as string,
     updated_at: formData.get("updated_at") as string,

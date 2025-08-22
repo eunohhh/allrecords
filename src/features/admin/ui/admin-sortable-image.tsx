@@ -42,11 +42,11 @@ function AdminSortableImage({ image, onDelete }: AdminSortableImageProps) {
       <img
         src={imageSrc}
         alt={image.desc}
-        className="h-full w-full object-cover rounded-sm"
+        className="h-full w-full rounded-sm object-cover"
       />
       <Button
         variant="secondary"
-        className="absolute right-0 top-0 h-4 w-4 p-0 cursor-pointer z-10 has-[>svg]:px-2"
+        className="absolute top-0 right-0 z-10 h-4 w-4 cursor-pointer p-0 has-[>svg]:px-2"
         onClick={handleDelete}
       >
         <X />

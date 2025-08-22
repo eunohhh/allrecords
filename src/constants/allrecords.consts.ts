@@ -9,15 +9,15 @@ export const QUERY_KEY_ADMIN_DESCS = "admin-descs";
 export const CHECKBOX_CATEGORY = [
   {
     label: "일상",
-    id: "daily",
+    id: "ilsang",
   },
   {
-    label: "호숲",
-    id: "hosoop",
+    label: "풀숲",
+    id: "poolsoop",
   },
   {
-    label: "작업",
-    id: "work",
+    label: "그림",
+    id: "grim",
   },
 ] as const;
 

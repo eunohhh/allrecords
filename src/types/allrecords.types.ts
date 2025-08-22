@@ -1,5 +1,5 @@
-import type { Tables } from "@/types/supabase";
 import { z } from "zod";
+import type { Database, Tables } from "@/types/supabase";
 
 export type Record = Tables<"allrecords">;
 
@@ -123,3 +123,5 @@ export interface MessageResponse {
     receiver_uuid: string[];
   }[];
 }
+
+export type Category = Database["public"]["Enums"]["records"];
