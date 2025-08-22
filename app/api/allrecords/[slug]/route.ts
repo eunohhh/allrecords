@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type {
+  Category,
   Record,
   RecordImage,
   RecordImagePost,
@@ -93,7 +94,7 @@ export async function PUT(
     id,
     title: formData.get("title") as string,
     description: formData.get("description") as string,
-    category: formData.get("category") as string,
+    category: formData.get("category") as Category,
     slug: formData.get("slug") as string,
     created_at: formData.get("created_at") as string,
     updated_at: formData.get("updated_at") as string,

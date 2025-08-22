@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.12 (cd3cf9e)"
@@ -16,7 +16,7 @@ export type Database = {
     Tables: {
       allrecords: {
         Row: {
-          category: string
+          category: Database["public"]["Enums"]["records"] | null
           created_at: string
           description: string
           id: string
@@ -26,7 +26,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          category?: string
+          category?: Database["public"]["Enums"]["records"] | null
           created_at?: string
           description?: string
           id?: string
@@ -36,7 +36,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          category?: string
+          category?: Database["public"]["Enums"]["records"] | null
           created_at?: string
           description?: string
           id?: string
@@ -109,7 +109,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      records: "poolsoop" | "ilsang" | "grim"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -236,6 +236,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      records: ["poolsoop", "ilsang", "grim"],
+    },
   },
 } as const

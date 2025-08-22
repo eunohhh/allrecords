@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type {
+  Category,
   Record,
   RecordImage,
   RecordImagePost,
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (category.length > 0) {
-    query.in("category", category);
+    query.in("category", category as Category[]);
   }
 
   const { data, error } = await query;
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
 
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
-  const category = formData.get("category") as string;
+  const category = formData.get("category") as Category;
   const slug = formData.get("slug") as string;
   const created_at = formData.get("created_at") as string;
   const updated_at = formData.get("updated_at") as string;

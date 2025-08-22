@@ -1,4 +1,4 @@
-import type { Tables } from "@/types/supabase";
+import type { Database, Tables } from "@/types/supabase";
 import { z } from "zod";
 
 export type Record = Tables<"allrecords">;
@@ -9,7 +9,7 @@ export interface RecordsParams {
   search: string;
   sort: string;
   order: string;
-  category: string;
+  category: Category;
 }
 
 export interface RecordImage {
@@ -123,3 +123,5 @@ export interface MessageResponse {
     receiver_uuid: string[];
   }[];
 }
+
+export type Category = Database["public"]["Enums"]["records"];
