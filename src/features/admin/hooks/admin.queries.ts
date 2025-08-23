@@ -1,3 +1,5 @@
+import type { User } from "@supabase/supabase-js";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   QUERY_KEY_ADMIN_DESCS,
   QUERY_KEY_ADMIN_RECORDS,
@@ -11,24 +13,24 @@ import type {
   RecordPost,
   RecordsParams,
 } from "@/types/allrecords.types";
-import type { User } from "@supabase/supabase-js";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   deleteAdminDescs,
   deleteAdminRecords,
   getAdminDescs,
   getAdminRecords,
+  getLastNumber,
   getUser,
   postAdminDescs,
   postAdminRecords,
   postAdminToken,
   putAdminDescs,
   putAdminRecords,
+  updateRecordsOrder,
 } from "../apis/admin.apis";
 
 export const useAdminRecordsQuery = (params: RecordsParams) => {
   return useQuery<Record[], Error>({
-    queryKey: [QUERY_KEY_ADMIN_RECORDS],
+    queryKey: [QUERY_KEY_ADMIN_RECORDS, params.category],
     queryFn: () => getAdminRecords(params),
   });
 };
@@ -44,6 +46,7 @@ export const useAdminRecordsMutation = () => {
       if (data.slug) formData.append("slug", data.slug);
       formData.append("created_at", data.created_at);
       formData.append("updated_at", data.updated_at);
+      formData.append("number", data.number.toString());
 
       const imagesInfo = data.images.map((image) => ({
         id: image.id,
@@ -86,6 +89,7 @@ export const useAdminRecordsPutMutation = () => {
       if (data.slug) formData.append("slug", data.slug);
       formData.append("created_at", data.created_at);
       formData.append("updated_at", formatDateToTZ(new Date()));
+      formData.append("number", data.number.toString());
 
       const imagesInfo = data.images.map((image) => ({
         id: image.id,
@@ -107,6 +111,37 @@ export const useAdminRecordsPutMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_RECORDS] });
     },
+  });
+};
+
+export const useAdminRecordsReorderMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    { message: string },
+    Error,
+    {
+      activeId: string;
+      overId: string;
+      activeCategory: string;
+      oldIndex: number;
+      newIndex: number;
+    }
+  >({
+    mutationFn: (params) => updateRecordsOrder(params),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_RECORDS] });
+    },
+  });
+};
+
+export const useLastNumberQuery = (category: string) => {
+  return useQuery<
+    { lastNumber: number; nextNumber: number; category: string },
+    Error
+  >({
+    queryKey: [QUERY_KEY_ADMIN_RECORDS, "lastNumber", category],
+    queryFn: () => getLastNumber(category),
+    enabled: !!category,
   });
 };
 

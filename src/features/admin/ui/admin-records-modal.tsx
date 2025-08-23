@@ -1,5 +1,25 @@
 "use client";
 
+import {
+  closestCenter,
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import type { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,28 +46,9 @@ import type {
   RecordPost,
 } from "@/types/allrecords.types";
 import {
-  DndContext,
-  type DragEndEvent,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import type { z } from "zod";
-import {
   useAdminRecordsMutation,
   useAdminRecordsPutMutation,
+  useLastNumberQuery,
 } from "../hooks/admin.queries";
 import { formSchema } from "../model/admin.schema";
 import { useAdminStore } from "../model/admin.store";
@@ -114,6 +115,12 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
     },
   });
 
+  // 현재 선택된 카테고리 가져오기
+  const selectedCategory = form.watch("category")[0];
+
+  // 선택된 카테고리의 마지막 순서 번호 가져오기
+  const { data: lastNumberData } = useLastNumberQuery(selectedCategory || "");
+
   const { fields, remove, move } = useFieldArray({
     control: form.control,
     name: "images",
@@ -161,6 +168,7 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
         file: image.file ? image.file : null,
         desc: image.desc,
       })),
+      number: data.number,
     };
     console.log("New record:", newRecord);
     if (record) {
@@ -188,6 +196,15 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
       images,
     });
   }, [record, form]);
+
+  // 카테고리가 변경될 때 자동으로 다음 순서 설정 (새 글 생성 시에만)
+  useEffect(() => {
+    if (record) return; // 수정 모드에서는 순서를 자동 설정하지 않음
+
+    if (selectedCategory && lastNumberData?.nextNumber) {
+      form.setValue("number", lastNumberData.nextNumber);
+    }
+  }, [selectedCategory, lastNumberData, form, record]);
 
   useEffect(() => {
     if (open) return;
@@ -271,6 +288,20 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
                       )}
                     />
                   </div>
+
+                  <FormField
+                    defaultValue={1}
+                    control={form.control}
+                    name="number"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>순서</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
 
                   {fields.length > 0 && (
                     <div className="grid grid-cols-4 place-items-center gap-2 rounded-md border border-gray-300 px-1 py-2">

@@ -3,15 +3,16 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import type { CheckedState } from "@radix-ui/react-checkbox";
-import { useHomeStore } from "../model/home.store";
+import { useState } from "react";
+import { useAdminStore } from "../model/admin.store";
 
-interface HomeCheckboxProps {
+interface AdminCheckboxProps {
   label: string;
   id: "poolsoop" | "ilsang" | "grim";
 }
 
-function HomeCheckbox({ label, id }: HomeCheckboxProps) {
-  const { category, setCategory } = useHomeStore();
+function AdminCheckbox({ label, id }: AdminCheckboxProps) {
+  const { category, setCategory } = useAdminStore();
   const checked = category.includes(id);
 
   const handleChange = (checked: CheckedState) => {
@@ -30,4 +31,4 @@ function HomeCheckbox({ label, id }: HomeCheckboxProps) {
   );
 }
 
-export default HomeCheckbox;
+export default AdminCheckbox;

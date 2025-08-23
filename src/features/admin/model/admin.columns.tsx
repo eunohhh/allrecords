@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import type { Desc, Record } from "@/types/allrecords.types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { Desc, Record } from "@/types/allrecords.types";
 import {
   useAdminDescsDeleteMutation,
   useAdminRecordsDeleteMutation,
@@ -82,6 +82,21 @@ export const recordsColumns: ColumnDef<Record>[] = [
       );
     },
     cell: ({ row }) => <div className="lowercase">{row.getValue("title")}</div>,
+  },
+  {
+    accessorKey: "number",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          순서
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div>{row.getValue("number")}</div>,
   },
   {
     accessorKey: "created_at",
