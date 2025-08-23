@@ -89,6 +89,7 @@ export const useAdminRecordsPutMutation = () => {
       if (data.slug) formData.append("slug", data.slug);
       formData.append("created_at", data.created_at);
       formData.append("updated_at", formatDateToTZ(new Date()));
+      formData.append("number", data.number.toString());
 
       const imagesInfo = data.images.map((image) => ({
         id: image.id,

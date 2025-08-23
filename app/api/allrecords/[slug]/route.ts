@@ -99,6 +99,7 @@ export async function PUT(
     created_at: formData.get("created_at") as string,
     updated_at: formData.get("updated_at") as string,
     images: uploadedImages as unknown as Json[],
+    number: formData.get("number") as unknown as number,
   };
 
   // console.log("put new record ===>", newRecord);
