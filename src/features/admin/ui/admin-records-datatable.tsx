@@ -33,9 +33,11 @@ import { ChevronDown, Loader2 } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { CHECKBOX_CATEGORY } from "@/constants/allrecords.consts";
 import { useAdminRecordsQuery } from "../hooks/admin.queries";
 import { recordsColumns } from "../model/admin.columns";
 import { useAdminStore } from "../model/admin.store";
+import AdminCheckbox from "./admin-checkbox";
 import AdminPagination from "./admin-pagination";
 
 const switchColumnIdToKorean = (id: string) => {
@@ -56,6 +58,7 @@ const switchColumnIdToKorean = (id: string) => {
 function AdminRecordsDatatable() {
   const [page, setPage] = useQueryState("page", parseAsInteger);
   const { category } = useAdminStore();
+
   const {
     data: recordsData,
     isPending,
@@ -108,6 +111,17 @@ function AdminRecordsDatatable() {
 
   return (
     <div className="w-full">
+      <div className="flex flex-col gap-2 mb-4">
+        <div className="flex flex-row justify-end gap-2">
+          {CHECKBOX_CATEGORY.map((category) => (
+            <AdminCheckbox
+              key={category.id}
+              label={category.label}
+              id={category.id}
+            />
+          ))}
+        </div>
+      </div>
       <div className="flex items-center py-2">
         <Input
           placeholder="Filter titles..."

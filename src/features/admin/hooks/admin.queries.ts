@@ -28,7 +28,7 @@ import {
 
 export const useAdminRecordsQuery = (params: RecordsParams) => {
   return useQuery<Record[], Error>({
-    queryKey: [QUERY_KEY_ADMIN_RECORDS],
+    queryKey: [QUERY_KEY_ADMIN_RECORDS, params.category],
     queryFn: () => getAdminRecords(params),
   });
 };
