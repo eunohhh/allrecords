@@ -1,3 +1,4 @@
+import type { User } from "@supabase/supabase-js";
 import api from "@/lib/utils";
 import type {
   Desc,
@@ -5,7 +6,6 @@ import type {
   Record,
   RecordsParams,
 } from "@/types/allrecords.types";
-import type { User } from "@supabase/supabase-js";
 
 export function getAdminRecords(params: RecordsParams) {
   return api.get<Record[], Record[]>("/api/allrecords", { params });
@@ -21,6 +21,26 @@ export function deleteAdminRecords(params: { ids: string[] }) {
 
 export function putAdminRecords(id: string, formData: FormData) {
   return api.put<Record[], Record[]>(`/api/allrecords/${id}`, formData);
+}
+
+export function updateRecordsOrder(params: {
+  activeId: string;
+  overId: string;
+  activeCategory: string;
+  oldIndex: number;
+  newIndex: number;
+}) {
+  return api.post<{ message: string }, { message: string }>(
+    "/api/allrecords/reorder",
+    params
+  );
+}
+
+export function getLastNumber(category: string) {
+  return api.get<
+    { lastNumber: number; nextNumber: number; category: string },
+    { lastNumber: number; nextNumber: number; category: string }
+  >(`/api/allrecords/last-number?category=${category}`);
 }
 
 export function getUser() {
