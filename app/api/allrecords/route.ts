@@ -1,3 +1,5 @@
+import { type NextRequest, NextResponse } from "next/server";
+import sharp from "sharp";
 import { createClient } from "@/lib/supabase/server";
 import type {
   Category,
@@ -6,8 +8,6 @@ import type {
   RecordImagePost,
 } from "@/types/allrecords.types";
 import type { Json } from "@/types/supabase";
-import { type NextRequest, NextResponse } from "next/server";
-import sharp from "sharp";
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
   const imagesInfo: Omit<RecordImagePost, "file">[] =
     JSON.parse(imagesInfoString);
   const imageFiles = formData.getAll("images") as File[];
+  const number = Number(formData.get("number")) || 1;
 
   const uploadedImages: RecordImage[] = [];
 
@@ -122,6 +123,7 @@ export async function POST(request: NextRequest) {
     created_at,
     updated_at,
     images: uploadedImages as unknown as Json[],
+    number,
   };
 
   const { data: newRecord, error } = await supabase
