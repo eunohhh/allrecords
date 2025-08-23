@@ -28,7 +28,13 @@ export interface RecordImagePost {
 export interface RecordPost
   extends Pick<
     Record,
-    "created_at" | "updated_at" | "title" | "description" | "category" | "slug"
+    | "created_at"
+    | "updated_at"
+    | "title"
+    | "description"
+    | "category"
+    | "slug"
+    | "number"
   > {
   images: RecordImagePost[];
 }
