@@ -1,5 +1,5 @@
-import type { Category } from "@/types/allrecords.types";
 import { z } from "zod";
+import type { Category } from "@/types/allrecords.types";
 
 export const formSchema = z.object({
   title: z.string().min(1),
@@ -14,4 +14,5 @@ export const formSchema = z.object({
       desc: z.string(),
     })
   ),
+  number: z.number().min(1),
 });
