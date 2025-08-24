@@ -15,8 +15,8 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Loader2, Plus, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
@@ -38,6 +38,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateToTZ } from "@/lib/utils";
 import type {
@@ -71,6 +72,7 @@ const defaultValues = {
   category: [] as ("poolsoop" | "ilsang" | "grim")[],
   slug: "",
   images: [],
+  thumbnail: null as string | File | null,
 };
 
 interface AdminModalProps {
@@ -82,6 +84,7 @@ interface AdminModalProps {
 function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
   const { setSelectedItem } = useAdminStore();
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [isThumbnailModalOpen, setIsThumbnailModalOpen] = useState(false);
   const {
     mutate: postAdminRecords,
     isPending: isCreating,
@@ -112,6 +115,7 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
       category: record?.category ? [record.category] : [],
       slug: record?.slug || "",
       images: (record?.images as unknown as RecordImagePost[]) || [],
+      thumbnail: record?.thumbnail || null,
     },
   });
 
@@ -136,6 +140,10 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
 
   const handleImageModalOpen = () => {
     setIsImageModalOpen(true);
+  };
+
+  const handleThumbnailModalOpen = () => {
+    setIsThumbnailModalOpen(true);
   };
 
   const handleImageDelete = (id: number) => {
@@ -169,6 +177,7 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
         desc: image.desc,
       })),
       number: data.number,
+      thumbnail: data.thumbnail || null,
     };
     console.log("New record:", newRecord);
     if (record) {
@@ -194,6 +203,7 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
       category: record.category ? [record.category] : [],
       slug: record.slug,
       images,
+      thumbnail: record.thumbnail || null, // 기존 thumbnail URL 유지
     });
   }, [record, form]);
 
@@ -231,131 +241,193 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
         </div>
       ) : (
         <>
-          <DialogContent className="w-full sm:max-w-3xl">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit, (errors) => {
-                  console.error("Form validation errors:", errors);
-                  toast.error("입력값을 확인해주세요.");
-                })}
-                className="space-y-4"
-              >
-                <DialogHeader>
-                  <DialogTitle>{record ? "수정" : "생성"}</DialogTitle>
-                  <DialogDescription className="hidden">
-                    {record ? "수정" : "생성"}할 내용을 입력해주세요.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4">
-                  {inputNames.map((input) => (
-                    <div className="grid gap-3" key={input.name}>
+          <DialogContent className="max-h-[90vh] w-full p-0 sm:max-w-3xl">
+            <div className="flex h-full max-h-[80vh] flex-col overflow-y-auto">
+              <DialogHeader className="px-6 pt-6">
+                <DialogTitle>{record ? "수정" : "생성"}</DialogTitle>
+                <DialogDescription className="hidden">
+                  {record ? "수정" : "생성"}할 내용을 입력해주세요.
+                </DialogDescription>
+              </DialogHeader>
+              <ScrollArea className="flex-1 px-6">
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit, (errors) => {
+                      console.error("Form validation errors:", errors);
+                      toast.error("입력값을 확인해주세요.");
+                    })}
+                    className="space-y-4 py-4"
+                  >
+                    <div className="grid gap-4">
+                      {inputNames.map((input) => (
+                        <div className="grid gap-3" key={input.name}>
+                          <FormField
+                            control={form.control}
+                            name={input.name}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{input.label}</FormLabel>
+                                <FormControl>
+                                  {input.name === "description" ? (
+                                    <Textarea
+                                      placeholder={`${input.label}을 입력해주세요.`}
+                                      {...field}
+                                    />
+                                  ) : (
+                                    <Input
+                                      placeholder={`${input.label}을 입력해주세요.`}
+                                      {...field}
+                                    />
+                                  )}
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      ))}
+
+                      <div className="grid gap-3">
+                        <FormField
+                          control={form.control}
+                          name="category"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>카테고리</FormLabel>
+                              <FormControl>
+                                <AdminSelect field={field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
                       <FormField
+                        defaultValue={record?.number || 1}
                         control={form.control}
-                        name={input.name}
+                        name="number"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{input.label}</FormLabel>
+                            <FormLabel>순서</FormLabel>
                             <FormControl>
-                              {input.name === "description" ? (
-                                <Textarea
-                                  placeholder={`${input.label}을 입력해주세요.`}
-                                  {...field}
-                                />
-                              ) : (
-                                <Input
-                                  placeholder={`${input.label}을 입력해주세요.`}
-                                  {...field}
-                                />
-                              )}
+                              <Input type="number" {...field} />
                             </FormControl>
                           </FormItem>
                         )}
                       />
-                    </div>
-                  ))}
 
-                  <div className="grid gap-3">
-                    <FormField
-                      control={form.control}
-                      name="category"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>카테고리</FormLabel>
-                          <FormControl>
-                            <AdminSelect field={field} />
-                          </FormControl>
-                        </FormItem>
+                      <div className="grid gap-3">
+                        <FormField
+                          control={form.control}
+                          name="thumbnail"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>썸네일 이미지</FormLabel>
+                              <FormControl>
+                                <div className="flex flex-col gap-2">
+                                  {field.value && (
+                                    <div className="relative inline-block">
+                                      <img
+                                        src={
+                                          typeof field.value === "string"
+                                            ? field.value
+                                            : URL.createObjectURL(field.value)
+                                        }
+                                        alt="썸네일 미리보기"
+                                        className="h-20 w-20 rounded-md object-contain"
+                                      />
+                                      <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
+                                        className="-top-2 -right-2 absolute h-6 w-6 rounded-full p-0"
+                                        onClick={() => field.onChange(null)}
+                                      >
+                                        <X />
+                                      </Button>
+                                    </div>
+                                  )}
+                                  <Button
+                                    type="button"
+                                    className="cursor-pointer"
+                                    onClick={handleThumbnailModalOpen}
+                                  >
+                                    <Plus /> 썸네일 추가
+                                  </Button>
+                                </div>
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      {fields.length > 0 && (
+                        <div className="grid grid-cols-4 place-items-center gap-2 rounded-md border border-gray-300 px-1 py-2">
+                          <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                          >
+                            <SortableContext
+                              items={fields.map((field) => field.id)}
+                              strategy={verticalListSortingStrategy}
+                            >
+                              {fields.map((field) => (
+                                <AdminSortableImage
+                                  key={field.id}
+                                  image={field}
+                                  onDelete={handleImageDelete}
+                                />
+                              ))}
+                            </SortableContext>
+                          </DndContext>
+                        </div>
                       )}
-                    />
-                  </div>
-
-                  <FormField
-                    defaultValue={1}
-                    control={form.control}
-                    name="number"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>순서</FormLabel>
-                        <FormControl>
-                          <Input type="number" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  {fields.length > 0 && (
-                    <div className="grid grid-cols-4 place-items-center gap-2 rounded-md border border-gray-300 px-1 py-2">
-                      <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                      >
-                        <SortableContext
-                          items={fields.map((field) => field.id)}
-                          strategy={verticalListSortingStrategy}
+                      <div className="grid gap-3">
+                        <Button
+                          type="button"
+                          className="cursor-pointer"
+                          onClick={handleImageModalOpen}
                         >
-                          {fields.map((field) => (
-                            <AdminSortableImage
-                              key={field.id}
-                              image={field}
-                              onDelete={handleImageDelete}
-                            />
-                          ))}
-                        </SortableContext>
-                      </DndContext>
+                          <Plus /> 이미지 추가
+                        </Button>
+                      </div>
                     </div>
-                  )}
-                  <div className="grid gap-3">
-                    <Button
-                      type="button"
-                      className="cursor-pointer"
-                      onClick={handleImageModalOpen}
-                    >
-                      <Plus /> 이미지 추가
-                    </Button>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="cursor-pointer"
-                    >
-                      Cancel
-                    </Button>
-                  </DialogClose>
-                  <Button type="submit" className="cursor-pointer">
-                    Save changes
+                  </form>
+                </Form>
+              </ScrollArea>
+              <DialogFooter className="px-6 pb-6">
+                <DialogClose asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="cursor-pointer"
+                  >
+                    Cancel
                   </Button>
-                </DialogFooter>
-              </form>
-            </Form>
+                </DialogClose>
+                <Button
+                  type="submit"
+                  className="cursor-pointer"
+                  onClick={form.handleSubmit(onSubmit, (errors) => {
+                    console.error("Form validation errors:", errors);
+                    toast.error("입력값을 확인해주세요.");
+                  })}
+                >
+                  Save changes
+                </Button>
+              </DialogFooter>
+            </div>
           </DialogContent>
           <AdminImageModal
             open={isImageModalOpen}
             setIsModalOpen={setIsImageModalOpen}
             form={form}
+          />
+          <AdminImageModal
+            open={isThumbnailModalOpen}
+            setIsModalOpen={setIsThumbnailModalOpen}
+            form={form}
+            mode="thumbnail"
           />
         </>
       )}

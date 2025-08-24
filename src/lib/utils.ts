@@ -31,4 +31,16 @@ export function formatDateToTZ(date: Date) {
   return date.toISOString().replace("T", " ").replace("Z", "+00");
 }
 
+export function sanitizeFilename(filename: string) {
+  return filename
+    .split(".")
+    .slice(0, -1)
+    .join(".")
+    .replace(/[^\w\s-.]/g, "") // 영문/숫자/공백/하이픈/마침표 외 문자 제거
+    .replace(/\s+/g, "-") // 공백을 하이픈으로
+    .replace(/-+/g, "-") // 연속 하이픈을 하나로
+    .replace(/^-+|-+$/g, "") // 앞/뒤 하이픈 제거
+    .substring(0, 200); // 길이 제한
+}
+
 export default api;
