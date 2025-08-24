@@ -39,14 +39,23 @@ export const useAdminRecordsMutation = () => {
   const queryClient = useQueryClient();
   return useMutation<Record, Error, RecordPost>({
     mutationFn: (data) => {
+      if (!data.category || !data.slug) {
+        throw new Error("Invalid data");
+      }
+
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("description", data.description);
-      if (data.category) formData.append("category", data.category);
-      if (data.slug) formData.append("slug", data.slug);
+      formData.append("category", data.category);
+      formData.append("slug", data.slug);
       formData.append("created_at", data.created_at);
       formData.append("updated_at", data.updated_at);
       formData.append("number", data.number.toString());
+
+      // thumbnail은 File인 경우에만 FormData에 추가 (새로 업로드하는 경우)
+      if (data.thumbnail && data.thumbnail instanceof File) {
+        formData.append("thumbnail", data.thumbnail);
+      }
 
       const imagesInfo = data.images.map((image) => ({
         id: image.id,
@@ -82,14 +91,25 @@ export const useAdminRecordsPutMutation = () => {
   const queryClient = useQueryClient();
   return useMutation<Record[], Error, { id: string; data: RecordPost }>({
     mutationFn: ({ id, data }) => {
+      if (!data.category || !data.slug) {
+        throw new Error("Invalid data");
+      }
+
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("description", data.description);
-      if (data.category) formData.append("category", data.category);
-      if (data.slug) formData.append("slug", data.slug);
+      formData.append("category", data.category);
+      formData.append("slug", data.slug);
       formData.append("created_at", data.created_at);
       formData.append("updated_at", formatDateToTZ(new Date()));
       formData.append("number", data.number.toString());
+
+      // thumbnail 처리: File인 경우만 FormData에 추가, string인 경우 기존 URL 유지
+      if (data.thumbnail && data.thumbnail instanceof File) {
+        formData.append("thumbnail", data.thumbnail);
+      } else if (typeof data.thumbnail === "string") {
+        formData.append("thumbnailUrl", data.thumbnail);
+      }
 
       const imagesInfo = data.images.map((image) => ({
         id: image.id,
