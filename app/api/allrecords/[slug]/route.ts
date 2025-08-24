@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 import { createClient } from "@/lib/supabase/server";
+import { sanitizeFilename } from "@/lib/utils";
 import type {
   Category,
   Record,
@@ -42,7 +43,10 @@ export async function PUT(
     formData.get("imagesInfo") as string
   );
   const imageFiles = formData.getAll("images") as File[];
+  const thumbnailFile = formData.get("thumbnail") as File | null;
+  const thumbnailUrl = formData.get("thumbnailUrl") as string | null;
   const uploadedImages: RecordImage[] = [];
+  let uploadedThumbnail: string | null = null;
 
   for (const info of imagesInfo) {
     uploadedImages.push({
@@ -65,7 +69,7 @@ export async function PUT(
       .webp({ quality: 80 })
       .toBuffer();
 
-    const originalFileName = file.name.split(".").slice(0, -1).join(".");
+    const originalFileName = sanitizeFilename(file.name);
     const fileName = `${crypto.randomUUID()}-${originalFileName}.webp`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
@@ -90,6 +94,42 @@ export async function PUT(
     fileIdx++;
   }
 
+  if (thumbnailFile) {
+    const thumbnailBuffer = await thumbnailFile.arrayBuffer();
+    const processedThumbnailBuffer = await sharp(thumbnailBuffer)
+      .webp({ quality: 80 })
+      .toBuffer();
+
+    const originalFileName = sanitizeFilename(thumbnailFile.name);
+
+    const fileName = `${crypto.randomUUID()}-${
+      originalFileName || "file"
+    }.webp`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("images")
+      .upload(fileName, processedThumbnailBuffer, {
+        contentType: "image/webp",
+      });
+
+    if (uploadError) {
+      console.error("Thumbnail upload error:", uploadError);
+      return NextResponse.json(
+        { error: "Failed to upload thumbnail." },
+        { status: 500 }
+      );
+    }
+
+    const { data: urlData } = supabase.storage
+      .from("images")
+      .getPublicUrl(uploadData.path);
+
+    uploadedThumbnail = urlData.publicUrl;
+  } else if (thumbnailUrl) {
+    // 기존 thumbnail URL을 유지
+    uploadedThumbnail = thumbnailUrl;
+  }
+
   const newRecord: Record = {
     id,
     title: formData.get("title") as string,
@@ -100,6 +140,7 @@ export async function PUT(
     updated_at: formData.get("updated_at") as string,
     images: uploadedImages as unknown as Json[],
     number: formData.get("number") as unknown as number,
+    thumbnail: uploadedThumbnail,
   };
 
   // console.log("put new record ===>", newRecord);
