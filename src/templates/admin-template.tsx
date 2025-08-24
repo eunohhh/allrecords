@@ -1,15 +1,18 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   useAdminTokenMutation,
   useAdminUserQuery,
 } from "@/features/admin/hooks/admin.queries";
 import { createClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
 
 function AdminTemplate() {
+  const router = useRouter();
   const [isToken, setIsToken] = useState(false);
-  const { data: user } = useAdminUserQuery();
+  const { data: user, error } = useAdminUserQuery();
   const { mutate: postAdminToken } = useAdminTokenMutation();
   // console.log("user ===>", user);
 
@@ -51,6 +54,14 @@ function AdminTemplate() {
     if (!user) return;
     if (isToken) postAdminToken(user);
   }, [isToken, postAdminToken, user]);
+
+  useEffect(() => {
+    if (error) {
+      console.error(error);
+      toast.error("로그인 정보가 만료되었습니다. 다시 로그인해주세요.");
+      router.push("/signin");
+    }
+  }, [error, router]);
 
   return (
     <div>

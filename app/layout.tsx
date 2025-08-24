@@ -1,8 +1,9 @@
-import QueryProvider from "@/lib/query-provider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import QueryProvider from "@/lib/query-provider";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
         <QueryProvider>
           <NuqsAdapter>{children}</NuqsAdapter>
         </QueryProvider>
+        <Toaster richColors position="top-center" />
       </body>
     </html>
   );

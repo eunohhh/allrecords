@@ -37,6 +37,7 @@ export interface RecordPost
     | "number"
   > {
   images: RecordImagePost[];
+  thumbnail: File | string | null;
 }
 
 export type Desc = Tables<"descs">;

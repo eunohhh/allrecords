@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 import { createClient } from "@/lib/supabase/server";
+import { sanitizeFilename } from "@/lib/utils";
 import type {
   Category,
   Record,
@@ -61,8 +62,10 @@ export async function POST(request: NextRequest) {
     JSON.parse(imagesInfoString);
   const imageFiles = formData.getAll("images") as File[];
   const number = Number(formData.get("number")) || 1;
+  const thumbnailFile = formData.get("thumbnail") as File | null;
 
   const uploadedImages: RecordImage[] = [];
+  let uploadedThumbnail: string | null = null;
 
   for (let i = 0; i < imageFiles.length; i++) {
     const file = imageFiles[i];
@@ -74,16 +77,7 @@ export async function POST(request: NextRequest) {
       .webp({ quality: 80 })
       .toBuffer();
 
-    // originalFileName 에 한글이 있을 경우 없애기
-    const originalFileName = file.name
-      .split(".")
-      .slice(0, -1)
-      .join(".")
-      .replace(/[^\w\s-.]/g, "") // 영문/숫자/공백/하이픈/마침표 외 문자 제거
-      .replace(/\s+/g, "-") // 공백을 하이픈으로
-      .replace(/-+/g, "-") // 연속 하이픈을 하나로
-      .replace(/^-+|-+$/g, "") // 앞/뒤 하이픈 제거
-      .substring(0, 200); // 길이 제한
+    const originalFileName = sanitizeFilename(file.name);
 
     const fileName = `${crypto.randomUUID()}-${
       originalFileName || "file"
@@ -114,6 +108,39 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  if (thumbnailFile) {
+    const thumbnailBuffer = await thumbnailFile.arrayBuffer();
+    const processedThumbnailBuffer = await sharp(thumbnailBuffer)
+      .webp({ quality: 80 })
+      .toBuffer();
+
+    const originalFileName = sanitizeFilename(thumbnailFile.name);
+
+    const fileName = `${crypto.randomUUID()}-${
+      originalFileName || "file"
+    }.webp`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("images")
+      .upload(fileName, processedThumbnailBuffer, {
+        contentType: "image/webp",
+      });
+
+    if (uploadError) {
+      console.error("Thumbnail upload error:", uploadError);
+      return NextResponse.json(
+        { error: "Failed to upload thumbnail." },
+        { status: 500 }
+      );
+    }
+
+    const { data: urlData } = supabase.storage
+      .from("images")
+      .getPublicUrl(uploadData.path);
+
+    uploadedThumbnail = urlData.publicUrl;
+  }
+
   const recordToInsert: Record = {
     id: crypto.randomUUID(),
     title,
@@ -124,6 +151,7 @@ export async function POST(request: NextRequest) {
     updated_at,
     images: uploadedImages as unknown as Json[],
     number,
+    thumbnail: uploadedThumbnail,
   };
 
   const { data: newRecord, error } = await supabase

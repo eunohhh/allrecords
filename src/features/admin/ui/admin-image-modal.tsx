@@ -1,5 +1,10 @@
 "use client";
 
+import { Image, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import { toast } from "sonner";
+import type { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,11 +17,6 @@ import {
 import { FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Image, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import type { UseFormReturn } from "react-hook-form";
-import { toast } from "sonner";
-import type { z } from "zod";
 import type { formSchema } from "../model/admin.schema";
 
 interface AdminImageModalProps {
@@ -24,6 +24,7 @@ interface AdminImageModalProps {
   setIsModalOpen: (isModalOpen: boolean) => void;
   // handleImageAdd: (image: Partial<RecordImagePost>) => void;
   form: UseFormReturn<z.infer<typeof formSchema>>;
+  mode?: "image" | "thumbnail";
 }
 
 function AdminImageModal({
@@ -31,6 +32,7 @@ function AdminImageModal({
   setIsModalOpen,
   // handleImageAdd,
   form,
+  mode = "image",
 }: AdminImageModalProps) {
   const [imageDescription, setImageDescription] = useState("");
   const [image, setImage] = useState<{
@@ -59,19 +61,31 @@ function AdminImageModal({
   };
 
   const handleSubmit = () => {
-    if (!image || !imageDescription) {
-      toast.error("이미지와 설명을 모두 입력해주세요.");
+    if (!image) {
+      toast.error("이미지를 선택해주세요.");
       return;
     }
-    form.setValue("images", [
-      ...form.getValues("images"),
-      {
-        file: image?.file!,
-        id: form.getValues("images").length,
-        desc: imageDescription,
-      },
-    ]);
-    setIsModalOpen(false);
+
+    if (mode === "thumbnail") {
+      // thumbnail 모드: thumbnail 필드에 직접 설정
+      form.setValue("thumbnail", image.file);
+      setIsModalOpen(false);
+    } else {
+      // image 모드: 기존 로직
+      if (!imageDescription) {
+        toast.error("이미지와 설명을 모두 입력해주세요.");
+        return;
+      }
+      form.setValue("images", [
+        ...form.getValues("images"),
+        {
+          file: image?.file!,
+          id: form.getValues("images").length,
+          desc: imageDescription,
+        },
+      ]);
+      setIsModalOpen(false);
+    }
   };
 
   useEffect(() => {
@@ -85,9 +99,13 @@ function AdminImageModal({
     <Dialog open={open} onOpenChange={setIsModalOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>이미지 추가</DialogTitle>
+          <DialogTitle>
+            {mode === "thumbnail" ? "썸네일 추가" : "이미지 추가"}
+          </DialogTitle>
           <DialogDescription className="hidden">
-            이미지를 추가해주세요.
+            {mode === "thumbnail"
+              ? "썸네일을 추가해주세요."
+              : "이미지를 추가해주세요."}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center justify-center">
@@ -96,7 +114,7 @@ function AdminImageModal({
               <img
                 src={image.url || URL.createObjectURL(image.file!)}
                 alt="이미지"
-                className="h-40 w-40 rounded-sm object-cover"
+                className="h-40 w-40 rounded-sm object-contain"
               />
               <Button
                 variant="secondary"
@@ -131,22 +149,26 @@ function AdminImageModal({
             )}
           />
         </div>
-        <div className="grid gap-3">
-          <Label htmlFor="image">이미지 설명</Label>
-          <Input
-            id="image"
-            name="image"
-            placeholder="이미지 설명을 입력해주세요."
-            onKeyDown={(e) => {
-              if (e.key === "Enter") buttonRef.current?.click();
-            }}
-            onChange={(e) => setImageDescription(e.target.value)}
-          />
-        </div>
+        {mode === "image" && (
+          <div className="grid gap-3">
+            <Label htmlFor="image">이미지 설명</Label>
+            <Input
+              id="image"
+              name="image"
+              placeholder="이미지 설명을 입력해주세요."
+              onKeyDown={(e) => {
+                if (e.key === "Enter") buttonRef.current?.click();
+              }}
+              onChange={(e) => setImageDescription(e.target.value)}
+            />
+          </div>
+        )}
         <DialogFooter>
           <Button
             ref={buttonRef}
-            disabled={!image || !imageDescription}
+            disabled={
+              mode === "thumbnail" ? !image : !image || !imageDescription
+            }
             type="button"
             onClick={handleSubmit}
             className="cursor-pointer"

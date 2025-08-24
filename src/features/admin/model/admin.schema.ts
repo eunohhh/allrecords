@@ -15,4 +15,8 @@ export const formSchema = z.object({
     })
   ),
   number: z.number().min(1),
+  thumbnail: z
+    .union([z.string(), z.instanceof(File)])
+    .optional()
+    .nullable(),
 });

@@ -1,6 +1,6 @@
+import { type NextRequest, NextResponse } from "next/server";
 import { EUN_MAIL } from "@/constants/allrecords.consts";
 import { createClient } from "@/lib/supabase/server";
-import { type NextRequest, NextResponse } from "next/server";
 
 interface TokenRequest {
   token: string;
