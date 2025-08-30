@@ -26,14 +26,14 @@ function HomeCheckbox({ label, id }: HomeCheckboxProps) {
       type="button"
       onClick={handleClick}
       className={cn(
-        "relative flex cursor-pointer flex-col items-center justify-center font-medium text-xl",
+        "relative flex min-w-12 cursor-pointer flex-col items-center justify-center font-medium text-xl",
         checked && "text-black"
       )}
       aria-pressed={checked}
       aria-label={`${label} 카테고리 ${checked ? "선택됨" : "선택 안됨"}`}
     >
       <span className="relative z-10">{label}</span>
-      {checked && (
+      {checked ? (
         <div className="relative h-2 w-12 overflow-hidden">
           <svg
             className="relative h-2 w-full"
@@ -53,6 +53,8 @@ function HomeCheckbox({ label, id }: HomeCheckboxProps) {
             />
           </svg>
         </div>
+      ) : (
+        <div className="relative h-2 w-12 overflow-hidden" />
       )}
     </button>
   );
