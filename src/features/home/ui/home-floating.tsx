@@ -9,7 +9,7 @@ function HomeFloating() {
       <Link href="/withcat">
         <Button
           type="button"
-          className="h-36 w-36 cursor-pointer bg-transparent p-0 shadow-none hover:bg-transparent"
+          className="h-24 w-24 cursor-pointer bg-transparent p-0 shadow-none hover:bg-transparent sm:h-36 sm:w-36"
         >
           <div className="h-full w-full bg-[url('/main-cat.webp')] bg-center bg-contain" />
         </Button>
@@ -17,7 +17,7 @@ function HomeFloating() {
       <Link href="/about">
         <Button
           type="button"
-          className="h-36 w-36 cursor-pointer bg-transparent p-0 shadow-none hover:bg-transparent"
+          className="h-24 w-24 cursor-pointer bg-transparent p-0 shadow-none hover:bg-transparent sm:h-36 sm:w-36"
         >
           <div className="h-full w-full bg-[url('/main-me.webp')] bg-center bg-contain" />
         </Button>
