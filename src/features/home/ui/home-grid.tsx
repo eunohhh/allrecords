@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import InfiniteScroll from "@/components/ui/infinite-scroll";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CHECKBOX_CATEGORY } from "@/constants/allrecords.consts";
-import { useRecordsQuery } from "../hooks/home.queries";
+import { useVirtualPagination } from "@/hooks/use-virtual-pagination";
+import { useFilteredRecords } from "../hooks/home.queries";
 import { useHomeStore } from "../model/home.store";
 import HomeCheckbox from "./home-checkbox";
 import HomeGridCard from "./home-grid-card";
@@ -12,16 +14,14 @@ function HomeGrid() {
   const { category } = useHomeStore();
 
   const {
-    data: allRecords,
-    isPending,
+    data: allRecords = [],
+    isLoading: isPending,
     error,
-  } = useRecordsQuery({
-    page: 1,
-    limit: 40,
-    search: "",
-    sort: "",
-    order: "",
-    category: category.join(","),
+  } = useFilteredRecords(category);
+
+  const { visibleItems, hasNextPage, fetchNextPage } = useVirtualPagination({
+    items: allRecords,
+    itemsPerPage: 24, // 초기 로드 수 (2-3 스크린 분량)
   });
 
   useEffect(() => {
@@ -41,16 +41,24 @@ function HomeGrid() {
           />
         ))}
       </div>
-      <div className="grid grid-cols-3 justify-items-center gap-1 sm:grid-cols-4 sm:gap-4 md:grid-cols-5 lg:grid-cols-6">
-        {isPending && (
-          <Skeleton className="min-h-30 min-w-10 rounded-lg bg-gray-400" />
-        )}
-        {allRecords
-          ? allRecords.map((record) => (
-              <HomeGridCard key={record.id} record={record} />
-            ))
-          : null}
-      </div>
+      <InfiniteScroll
+        fetchNextPage={fetchNextPage}
+        hasNextPage={hasNextPage && !isPending}
+      >
+        <div className="grid grid-cols-3 justify-items-center gap-1 sm:grid-cols-4 sm:gap-4 md:grid-cols-5 lg:grid-cols-6">
+          {isPending && visibleItems.length === 0 && (
+            <Skeleton className="min-h-30 min-w-10 rounded-lg bg-gray-400" />
+          )}
+          {visibleItems.map((record) => (
+            <HomeGridCard key={record.id} record={record} />
+          ))}
+        </div>
+      </InfiniteScroll>
+      {hasNextPage && !isPending && (
+        <div className="flex justify-center py-4">
+          <Skeleton className="h-8 w-24 bg-gray-200" />
+        </div>
+      )}
     </section>
   );
 }
