@@ -1,13 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
+import { useShallow } from "zustand/react/shallow";
 import {
   AdminHeader,
   AdminRecordsDatatable,
   AdminRecordsModal,
 } from "@/features/admin";
 import { useAdminStore } from "@/features/admin/model/admin.store";
-import { useEffect } from "react";
-import { useShallow } from "zustand/react/shallow";
 
 function AdminRecordsTemplate() {
   const { selectedItem, isModalOpen, setIsModalOpen } = useAdminStore(

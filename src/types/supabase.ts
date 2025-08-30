@@ -24,6 +24,7 @@ export type Database = {
           description: string
           id: string
           images: Json[] | null
+          keywords: string[] | null
           number: number
           slug: string
           thumbnail: string | null
@@ -36,6 +37,7 @@ export type Database = {
           description?: string
           id?: string
           images?: Json[] | null
+          keywords?: string[] | null
           number?: number
           slug?: string
           thumbnail?: string | null
@@ -48,6 +50,7 @@ export type Database = {
           description?: string
           id?: string
           images?: Json[] | null
+          keywords?: string[] | null
           number?: number
           slug?: string
           thumbnail?: string | null
