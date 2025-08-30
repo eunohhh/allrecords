@@ -1,16 +1,15 @@
 "use client";
 
-import { AboutForm, AboutText } from "@/features/about";
+import H1 from "@/components/ui/h1";
+import { AboutText } from "@/features/about";
 
 function AboutTemplate() {
   return (
-    <main className="flex h-svh flex-col px-2">
-      <div className="flex flex-col gap-4 pb-4">
-        <h1 className="font-bold text-4xl">allrecords.me</h1>
-      </div>
+    <div className="flex flex-col sm:min-h-[calc(100svh-80px)]">
+      <H1 />
       <AboutText />
-      <AboutForm />
-    </main>
+      {/* <AboutForm /> */}
+    </div>
   );
 }
 
