@@ -1,7 +1,7 @@
 "use client";
 
-import type { Json } from "@/types/supabase";
 import Image from "next/image";
+import type { Json } from "@/types/supabase";
 import type { RecordImage } from "../model/record.type";
 
 interface RecordImagesProps {
@@ -13,7 +13,10 @@ function RecordImages({ recordImages }: RecordImagesProps) {
     <div className="flex flex-col gap-4">
       {recordImages?.map((image) =>
         image && typeof image === "object" ? (
-          <div className="relative h-96 w-full" key={(image as RecordImage).id}>
+          <div
+            className="relative h-56 w-full sm:h-96"
+            key={(image as RecordImage).id}
+          >
             <Image
               src={(image as RecordImage).url}
               alt={(image as RecordImage).desc}

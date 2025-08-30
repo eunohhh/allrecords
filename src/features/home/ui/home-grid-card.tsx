@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useContentParam } from "@/hooks/use-content-param";
 import type { Record } from "@/types/allrecords.types";
 
 interface HomeGridCardProps {
@@ -8,12 +8,20 @@ interface HomeGridCardProps {
 }
 
 function HomeGridCard({ record }: HomeGridCardProps) {
+  const { setContent } = useContentParam();
+
   if (!record.thumbnail) return null;
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setContent(record.slug);
+  };
+
   return (
-    <Link
-      href={`/${record.slug}`}
-      className="relative flex h-[calc(190/619*100svw)] w-full items-center justify-center sm:h-[calc(272/1920*100svw)] sm:w-full"
+    <button
+      type="button"
+      onClick={handleClick}
+      className="relative flex h-[calc(190/619*100svw)] w-full cursor-pointer items-center justify-center sm:h-[calc(272/1920*100svw)] sm:w-full"
     >
       <div className="relative h-full w-full rounded-lg">
         <img
@@ -24,7 +32,7 @@ function HomeGridCard({ record }: HomeGridCardProps) {
         {/* <h2>{record.title}</h2>
         <p>{record.slug}</p> */}
       </div>
-    </Link>
+    </button>
   );
 }
 
