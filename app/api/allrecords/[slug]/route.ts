@@ -130,12 +130,16 @@ export async function PUT(
     uploadedThumbnail = thumbnailUrl;
   }
 
+  const keywordsString = formData.get("keywords") as string;
+  const keywords: string[] = keywordsString ? JSON.parse(keywordsString) : [];
+
   const newRecord: Record = {
     id,
     title: formData.get("title") as string,
     description: formData.get("description") as string,
     category: formData.get("category") as Category,
     slug: formData.get("slug") as string,
+    keywords: keywords,
     created_at: formData.get("created_at") as string,
     updated_at: formData.get("updated_at") as string,
     images: uploadedImages as unknown as Json[],

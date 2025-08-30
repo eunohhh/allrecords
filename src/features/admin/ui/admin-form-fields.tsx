@@ -9,6 +9,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -115,6 +116,87 @@ function NumberFormField({
   );
 }
 
+function KeywordFormField({
+  form,
+}: {
+  form: UseFormReturn<z.infer<typeof formSchema>>;
+}) {
+  const keywords = form.watch("keywords") || [];
+
+  const handleAddKeyword = (index: number) => {
+    const newKeywords = [...keywords];
+    newKeywords[index] = "";
+    form.setValue("keywords", newKeywords);
+  };
+
+  const handleRemoveKeyword = (index: number) => {
+    const newKeywords = keywords.filter((_, i) => i !== index);
+    form.setValue("keywords", newKeywords);
+  };
+
+  const handleKeywordChange = (index: number, value: string) => {
+    const newKeywords = [...keywords];
+    newKeywords[index] = value;
+    form.setValue("keywords", newKeywords);
+  };
+
+  return (
+    <div className="grid gap-3">
+      <FormLabel>키워드 (최대 3개, 각 5자 이하)</FormLabel>
+      <div className="grid grid-cols-3 gap-2">
+        {[0, 1, 2].map((index) => (
+          <div key={`keyword-slot-${index}`} className="relative">
+            {keywords[index] !== undefined ? (
+              <>
+                <FormField
+                  control={form.control}
+                  name={`keywords.${index}` as const}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          placeholder={`키워드 ${index + 1}`}
+                          maxLength={5}
+                          {...field}
+                          className="pr-8"
+                          onChange={(e) => {
+                            field.onChange(e);
+                            handleKeywordChange(index, e.target.value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-1 right-1 h-6 w-6 p-0 hover:bg-red-100"
+                  onClick={() => handleRemoveKeyword(index)}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                className="h-10 w-full"
+                onClick={() => handleAddKeyword(index)}
+                disabled={keywords.length >= 3}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ThumbnailFormField({
   form,
   onThumbnailModalOpen,
@@ -147,7 +229,7 @@ function ThumbnailFormField({
                       type="button"
                       variant="secondary"
                       size="sm"
-                      className="-top-2 -right-2 absolute h-6 w-6 rounded-full p-0"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full p-0"
                       onClick={() => field.onChange(null)}
                     >
                       <X />
@@ -180,6 +262,7 @@ export function AdminFormFields({
       <TextFormFields form={form} />
       <CategoryFormField form={form} />
       <NumberFormField form={form} record={record} />
+      <KeywordFormField form={form} />
       <ThumbnailFormField
         form={form}
         onThumbnailModalOpen={onThumbnailModalOpen}

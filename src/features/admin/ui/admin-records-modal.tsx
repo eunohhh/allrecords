@@ -41,6 +41,7 @@ const defaultValues = {
   description: "",
   category: [] as ("poolsoop" | "ilsang" | "grim")[],
   slug: "",
+  keywords: [] as string[],
   images: [],
   thumbnail: null as string | File | null,
 };
@@ -73,6 +74,7 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
       description: record?.description || "",
       category: record?.category ? [record.category] : [],
       slug: record?.slug || "",
+      keywords: (record?.keywords as string[]) || [],
       images: (record?.images as unknown as RecordImagePost[]) || [],
       thumbnail: record?.thumbnail || null,
     },
@@ -127,6 +129,7 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
     const newRecord: RecordPost = {
       ...data,
       category: data.category[0] || null,
+      keywords: data.keywords.filter((keyword) => keyword.trim() !== ""), // 빈 키워드 제거
       created_at: formatDateToTZ(now),
       updated_at: formatDateToTZ(now),
       images: data.images.map((image) => ({
@@ -161,6 +164,7 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
       description: record.description,
       category: record.category ? [record.category] : [],
       slug: record.slug,
+      keywords: (record.keywords as string[]) || [],
       images,
       thumbnail: record.thumbnail || null, // 기존 thumbnail URL 유지
     });

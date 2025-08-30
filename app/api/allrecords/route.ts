@@ -55,6 +55,8 @@ export async function POST(request: NextRequest) {
   const description = formData.get("description") as string;
   const category = formData.get("category") as Category;
   const slug = formData.get("slug") as string;
+  const keywordsString = formData.get("keywords") as string;
+  const keywords: string[] = keywordsString ? JSON.parse(keywordsString) : [];
   const created_at = formData.get("created_at") as string;
   const updated_at = formData.get("updated_at") as string;
   const imagesInfoString = formData.get("imagesInfo") as string;
@@ -147,6 +149,7 @@ export async function POST(request: NextRequest) {
     description,
     category,
     slug,
+    keywords: keywords,
     created_at,
     updated_at,
     images: uploadedImages as unknown as Json[],

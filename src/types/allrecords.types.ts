@@ -36,6 +36,7 @@ export interface RecordPost
     | "slug"
     | "number"
   > {
+  keywords: string[];
   images: RecordImagePost[];
   thumbnail: File | string | null;
 }
