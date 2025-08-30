@@ -1,9 +1,8 @@
 "use client";
 
+import type { CheckedState } from "@radix-ui/react-checkbox";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import type { CheckedState } from "@radix-ui/react-checkbox";
-import { useState } from "react";
 import { useAdminStore } from "../model/admin.store";
 
 interface AdminCheckboxProps {

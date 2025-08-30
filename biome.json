@@ -31,7 +31,7 @@
       "recommended": true,
       "correctness": {
         "noUnusedVariables": "off",
-        "noUnusedImports": "off",
+        "noUnusedImports": "error",
         "noUnusedFunctionParameters": "off"
       },
       "suspicious": {

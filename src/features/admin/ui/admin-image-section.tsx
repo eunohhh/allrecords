@@ -15,7 +15,6 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
-import type { UseFieldArrayReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import type { RecordImagePost } from "@/types/allrecords.types";
 import AdminSortableImage from "./admin-sortable-image";
