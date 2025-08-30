@@ -1,8 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CHECKBOX_CATEGORY } from "@/constants/allrecords.consts";
-import { useEffect } from "react";
 import { useRecordsQuery } from "../hooks/home.queries";
 import { useHomeStore } from "../model/home.store";
 import HomeCheckbox from "./home-checkbox";
@@ -32,7 +32,7 @@ function HomeGrid() {
 
   return (
     <section className="flex flex-col gap-2">
-      <div className="flex flex-row justify-end gap-2">
+      <div className="flex flex-row justify-end gap-6">
         {CHECKBOX_CATEGORY.map((category) => (
           <HomeCheckbox
             key={category.id}

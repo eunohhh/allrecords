@@ -1,8 +1,6 @@
 "use client";
 
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import type { CheckedState } from "@radix-ui/react-checkbox";
+import { cn } from "@/lib/utils";
 import { useHomeStore } from "../model/home.store";
 
 interface HomeCheckboxProps {
@@ -14,19 +12,48 @@ function HomeCheckbox({ label, id }: HomeCheckboxProps) {
   const { category, setCategory } = useHomeStore();
   const checked = category.includes(id);
 
-  const handleChange = (checked: CheckedState) => {
+  const handleClick = () => {
     if (checked) {
-      setCategory([...category, id]);
-    } else {
       setCategory(category.filter((c) => c !== id));
+    } else {
+      setCategory([...category, id]);
     }
   };
 
   return (
-    <div className="flex min-w-16 items-center justify-center gap-1">
-      <Checkbox id={id} checked={checked} onCheckedChange={handleChange} />
-      <Label htmlFor={id}>{label}</Label>
-    </div>
+    <button
+      type="button"
+      onClick={handleClick}
+      className={cn(
+        "relative flex cursor-pointer flex-col items-center justify-center font-medium text-xl",
+        checked && "text-black"
+      )}
+      aria-pressed={checked}
+      aria-label={`${label} 카테고리 ${checked ? "선택됨" : "선택 안됨"}`}
+    >
+      <span className="relative z-10">{label}</span>
+      {checked && (
+        <div className="relative h-2 w-12 overflow-hidden">
+          <svg
+            className="relative h-2 w-full"
+            viewBox="0 0 100 8"
+            preserveAspectRatio="none"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            role="img"
+            aria-label="선택된 카테고리 표시"
+          >
+            <path
+              d="M0 4C8.33 2 16.67 6 25 4C33.33 2 41.67 6 50 4C58.33 2 66.67 6 75 4C83.33 2 91.67 6 100 4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              className="text-black"
+              fill="none"
+            />
+          </svg>
+        </div>
+      )}
+    </button>
   );
 }
 
