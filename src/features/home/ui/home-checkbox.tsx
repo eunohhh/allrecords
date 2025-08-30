@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { useHomeStore } from "../model/home.store";
 
@@ -12,13 +13,13 @@ function HomeCheckbox({ label, id }: HomeCheckboxProps) {
   const { category, setCategory } = useHomeStore();
   const checked = category.includes(id);
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (checked) {
       setCategory(category.filter((c) => c !== id));
     } else {
       setCategory([...category, id]);
     }
-  };
+  }, [checked, category, id, setCategory]);
 
   return (
     <button
