@@ -52,6 +52,14 @@ export interface DescsParams {
   category: string;
 }
 
+export interface ReorderParams {
+  activeId: string;
+  overId: string;
+  activeCategory: Category;
+  oldIndex: number;
+  newIndex: number;
+}
+
 export type Token = Tables<"token">;
 
 // Zod 스키마 정의

@@ -12,6 +12,7 @@ import type {
   Record,
   RecordPost,
   RecordsParams,
+  ReorderParams,
 } from "@/types/allrecords.types";
 import {
   deleteAdminDescs,
@@ -138,17 +139,7 @@ export const useAdminRecordsPutMutation = () => {
 
 export const useAdminRecordsReorderMutation = () => {
   const queryClient = useQueryClient();
-  return useMutation<
-    { message: string },
-    Error,
-    {
-      activeId: string;
-      overId: string;
-      activeCategory: string;
-      oldIndex: number;
-      newIndex: number;
-    }
-  >({
+  return useMutation<{ message: string }, Error, ReorderParams>({
     mutationFn: (params) => updateRecordsOrder(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ADMIN_RECORDS] });

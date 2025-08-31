@@ -50,6 +50,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CHECKBOX_CATEGORY } from "@/constants/allrecords.consts";
+import { Category } from "@/types/allrecords.types";
 import {
   useAdminRecordsQuery,
   useAdminRecordsReorderMutation,
@@ -203,7 +204,7 @@ function AdminRecordsDatatable() {
         reorderRecords({
           activeId: activeRow.original.id,
           overId: overRow.original.id,
-          activeCategory: activeRow.original.category || "",
+          activeCategory: activeRow.original.category as Category,
           oldIndex,
           newIndex,
         });

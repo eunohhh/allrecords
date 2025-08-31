@@ -5,6 +5,7 @@ import type {
   DescsParams,
   Record,
   RecordsParams,
+  ReorderParams,
 } from "@/types/allrecords.types";
 
 export function getAdminRecords(params: RecordsParams) {
@@ -23,13 +24,7 @@ export function putAdminRecords(id: string, formData: FormData) {
   return api.put<Record[], Record[]>(`/api/allrecords/${id}`, formData);
 }
 
-export function updateRecordsOrder(params: {
-  activeId: string;
-  overId: string;
-  activeCategory: string;
-  oldIndex: number;
-  newIndex: number;
-}) {
+export function updateRecordsOrder(params: ReorderParams) {
   return api.post<{ message: string }, { message: string }>(
     "/api/allrecords/reorder",
     params
