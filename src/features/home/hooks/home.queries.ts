@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { QUERY_KEY_RECORDS } from "@/constants/allrecords.consts";
+import {
+  QUERY_KEY_ALL,
+  QUERY_KEY_RECORDS,
+} from "@/constants/allrecords.consts";
 import type {
   Category,
   Desc,
@@ -13,7 +16,7 @@ import { getAllRecords, getDescs, getRecords } from "../apis/home.apis";
 // 전체 레코드를 한 번에 가져오는 훅
 export const useAllRecordsQuery = () => {
   return useQuery<Record[], Error>({
-    queryKey: [QUERY_KEY_RECORDS, "all"],
+    queryKey: [QUERY_KEY_RECORDS, QUERY_KEY_ALL],
     queryFn: () => getAllRecords(),
     staleTime: 1000 * 60 * 5, // 5분간 캐시 유지
     gcTime: 1000 * 60 * 10, // 10분간 메모리 유지

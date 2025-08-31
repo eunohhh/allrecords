@@ -1,4 +1,5 @@
 export const QUERY_KEY_RECORDS = "records";
+export const QUERY_KEY_ALL = "all";
 export const QUERY_KEY_RECORD = "record";
 export const QUERY_KEY_DESCS = "descs";
 export const QUERY_KEY_DESC = "desc";
