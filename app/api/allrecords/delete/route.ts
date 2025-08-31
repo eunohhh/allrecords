@@ -1,6 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   const { ids }: { ids: string[] } = await request.json();
@@ -25,5 +26,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  revalidatePath(`/`, "page");
   return NextResponse.json(data, { status: 200 });
 }

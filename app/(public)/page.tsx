@@ -10,6 +10,8 @@ import {
 import { getAllRecordsServer } from "@/features/home/apis/home.server-apis";
 import HomeTemplate from "@/templates/home-template";
 
+export const dynamic = "force-static";
+
 async function PublicPage() {
   const queryClient = new QueryClient();
 

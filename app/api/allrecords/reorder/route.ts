@@ -1,5 +1,13 @@
+import { PostgrestSingleResponse } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { ReorderParams } from "@/types/allrecords.types";
+
+interface PartialRecord {
+  id: string;
+  number: number;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,7 +22,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as ReorderParams;
     const { activeId, overId, activeCategory, oldIndex, newIndex } = body;
 
     if (!activeId || !overId || !activeCategory) {
@@ -47,10 +55,10 @@ export async function POST(request: NextRequest) {
 
     // oldIndex와 newIndex를 실제 데이터베이스 인덱스로 변환
     const activeRecord = updatedRecords.find(
-      (record: any) => record.id === activeId
+      (record: PartialRecord) => record.id === activeId
     );
     const overRecord = updatedRecords.find(
-      (record: any) => record.id === overId
+      (record: PartialRecord) => record.id === overId
     );
 
     if (!activeRecord || !overRecord) {
@@ -59,10 +67,10 @@ export async function POST(request: NextRequest) {
 
     // 현재 위치에서 제거
     const currentIndex = updatedRecords.findIndex(
-      (record: any) => record.id === activeId
+      (record: PartialRecord) => record.id === activeId
     );
     const targetIndex = updatedRecords.findIndex(
-      (record: any) => record.id === overId
+      (record: PartialRecord) => record.id === overId
     );
 
     if (currentIndex === -1 || targetIndex === -1) {
@@ -84,7 +92,9 @@ export async function POST(request: NextRequest) {
     const updateResults = await Promise.all(updatePromises);
 
     // 에러 확인
-    const hasError = updateResults.some((result: any) => result.error);
+    const hasError = updateResults.some(
+      (result: PostgrestSingleResponse<null>) => result.error
+    );
     if (hasError) {
       console.error("Error updating records:", updateResults);
       return NextResponse.json(
@@ -93,6 +103,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    revalidatePath(`/`, "page");
     return NextResponse.json({
       message: "Records reordered successfully",
       oldIndex,
