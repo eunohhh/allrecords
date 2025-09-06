@@ -19,7 +19,12 @@ function AboutText() {
           </section>
           <section className="flex h-full flex-col border-b-2 py-8 md:gap-3 md:border-r-2 md:border-b-0 md:py-8 md:pr-8">
             <div className="relative aspect-[1043/140] w-[90%] max-w-[440px] md:max-w-none">
-              <Image src="/about01.webp" alt="about01" fill />
+              <Image
+                src="/about01.webp"
+                alt="about01"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
             </div>
             <p className="h-full whitespace-pre-line">{aboutText[1]}</p>
           </section>
@@ -31,6 +36,7 @@ function AboutText() {
                 src="/about02.webp"
                 alt="about02"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="aspect-[540/698] object-contain"
               />
             </div>
@@ -46,6 +52,7 @@ function AboutText() {
                   src="/about03.webp"
                   alt="about03"
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="aspect-[998/899] object-contain"
                 />
               </div>

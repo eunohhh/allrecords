@@ -1,8 +1,8 @@
 "use client";
 
-import H1 from "@/components/ui/h1";
 import RecordModal from "@/components/ui/record-modal";
 import { HomeFloating, HomeGrid } from "@/features/home";
+import H1 from "@/features/home/ui/h1";
 import { useContentParam } from "@/hooks/use-content-param";
 
 function HomeTemplate() {

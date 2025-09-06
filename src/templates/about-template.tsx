@@ -1,7 +1,7 @@
 "use client";
 
-import H1 from "@/components/ui/h1";
 import { AboutText } from "@/features/about";
+import H1 from "@/features/home/ui/h1";
 
 function AboutTemplate() {
   return (
