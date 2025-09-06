@@ -1,7 +1,9 @@
-import Loading from "@/components/ui/loading";
+import LoadingStar from "@/features/home/ui/loading-star";
 
-function LoadingPage() {
-  return <Loading type="full" />;
+function Loading() {
+  return (
+    <LoadingStar className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2" />
+  );
 }
 
-export default LoadingPage;
+export default Loading;

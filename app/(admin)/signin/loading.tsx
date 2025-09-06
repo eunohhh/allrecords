@@ -1,7 +1,7 @@
-import Loading from "@/components/ui/loading";
+import LoadingStar from "@/features/home/ui/loading-star";
 
-function LoadingPage() {
-  return <Loading type="full" />;
+function Loading() {
+  return <LoadingStar />;
 }
 
-export default LoadingPage;
+export default Loading;
