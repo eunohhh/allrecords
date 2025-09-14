@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import PoolsoopTemplate from "@/templates/poolsoop-template";
 
 export const metadata: Metadata = {
   title: "Poolsoop",
@@ -6,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 function PoolsOopPage() {
-  return <div>page</div>;
+  return <PoolsoopTemplate />;
 }
 
 export default PoolsOopPage;
