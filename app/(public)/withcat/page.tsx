@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import WithCatTemplate from "@/templates/withcat-template";
 
 export const metadata: Metadata = {
   title: "WithCat",
@@ -6,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 function WithCatPage() {
-  return <div>page</div>;
+  return <WithCatTemplate />;
 }
 
 export default WithCatPage;

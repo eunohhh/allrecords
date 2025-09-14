@@ -1,5 +1,10 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertCircle, CheckCircle2, MessageSquare } from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,14 +29,9 @@ import {
   type InquiryFormValues,
   inquiryFormSchema,
 } from "@/types/allrecords.types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle, CheckCircle2, MessageSquare } from "lucide-react";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { useKakaoMessageMutation } from "../hooks/about.hooks";
+import { useKakaoMessageMutation } from "../../about/hooks/about.hooks";
 
-function AboutForm() {
+function ContactForm() {
   const {
     mutate: onSubmit,
     isPending,
@@ -181,4 +181,4 @@ function AboutForm() {
   );
 }
 
-export default AboutForm;
+export default ContactForm;
