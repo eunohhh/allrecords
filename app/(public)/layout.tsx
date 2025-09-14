@@ -1,7 +1,8 @@
 import { PropsWithChildren } from "react";
+import { MainWrapper } from "@/features/home";
 
 function PublicLayout({ children }: PropsWithChildren) {
-  return <main className="flex flex-col p-3 sm:p-10">{children}</main>;
+  return <MainWrapper>{children}</MainWrapper>;
 }
 
 export default PublicLayout;
