@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 
 const aboutText = [
@@ -46,14 +44,14 @@ function AboutText() {
             <p className="h-full w-full whitespace-pre-line md:w-[63%]">
               {aboutText[3]}
             </p>
-            <div className="flex h-[calc(250/768*100svw)] justify-end md:min-h-[300px] md:w-[37%] md:justify-start">
-              <div className="relative w-1/2 md:w-[90%]">
+            <div className="flex h-[calc(250/768*100svw)] justify-end md:h-[calc(430/1920*100svw)] md:w-[37%] md:items-end md:justify-start">
+              <div className="relative aspect-[998/899] w-1/2 md:h-fit md:w-[90%]">
                 <Image
                   src="/about03.webp"
                   alt="about03"
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="aspect-[998/899] object-contain"
+                  className="object-contain"
                 />
               </div>
             </div>
