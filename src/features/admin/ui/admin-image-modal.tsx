@@ -79,7 +79,7 @@ function AdminImageModal({
       form.setValue("images", [
         ...form.getValues("images"),
         {
-          file: image?.file!,
+          file: image?.file ?? null,
           id: form.getValues("images").length,
           desc: imageDescription,
         },
