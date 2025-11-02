@@ -11,6 +11,7 @@ export const metadata: Metadata = {
     template: "%s | AllRecords",
   },
   description: "AllRecords는 Misun의 모든 기록을 저장하는 공간입니다.",
+  metadataBase: new URL("https://allrecords.me"),
   keywords: ["블로그", "만화", "고양이"],
   authors: [{ name: "YiiiMisun", url: "https://allrecords.me" }],
   creator: "YiiiMisun",

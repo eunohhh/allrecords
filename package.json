@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "pnpm biome lint",
@@ -56,12 +56,12 @@
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.16.0",
     "lucide-react": "^0.513.0",
-    "next": "15.4.5",
+    "next": "16.0.1",
     "next-themes": "^0.4.6",
     "nuqs": "^2.4.3",
-    "react": "19.1.0",
+    "react": "19.2.0",
     "react-day-picker": "^9.7.0",
-    "react-dom": "19.1.0",
+    "react-dom": "19.2.0",
     "react-hook-form": "^7.57.0",
     "react-icons": "^5.5.0",
     "react-intersection-observer": "^9.16.0",
@@ -78,12 +78,18 @@
     "@biomejs/biome": "2.0.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/react": "19.1.0",
-    "@types/react-dom": "19.1.0",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
     "husky": "^9.1.7",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.4",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1"
+  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1",
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.2.2",
+      "@types/react-dom": "19.2.2"
+    }
+  }
 }
