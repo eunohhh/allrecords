@@ -1,3 +1,5 @@
+import axios, { type AxiosInstance, type AxiosResponse } from "axios";
+import { type NextRequest, NextResponse } from "next/server";
 import { PUBLIC_URL } from "@/constants/allrecords.consts";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -8,8 +10,6 @@ import type {
   RefreshTokenResponse,
   TemplateObject,
 } from "@/types/allrecords.types";
-import axios, { type AxiosInstance, type AxiosResponse } from "axios";
-import { type NextRequest, NextResponse } from "next/server";
 
 const misunUUId = process.env.MISUN_UUID;
 
@@ -226,70 +226,104 @@ ${message}
         refresh_token: refresh_token,
       });
 
-      const refreshTokenResponse: AxiosResponse<RefreshTokenResponse> =
-        await kakaoAuthApi.post("/oauth/token", refreshRequestData, {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+      try {
+        const refreshTokenResponse: AxiosResponse<RefreshTokenResponse> =
+          await kakaoAuthApi.post("/oauth/token", refreshRequestData, {
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+            },
+          });
+
+        if (refreshTokenResponse.status !== 200) {
+          return NextResponse.json(
+            { error: "Failed to refresh token" },
+            { status: 500 }
+          );
+        }
+
+        if (!refreshTokenResponse.data) {
+          return NextResponse.json(
+            { error: "Failed to refresh token" },
+            { status: 500 }
+          );
+        }
+
+        const { access_token, refresh_token: newRefreshToken } =
+          refreshTokenResponse.data;
+
+        // created_at 이 가장 빠른 데이터 찾기
+        const { data: oldestToken, error: oldestTokenError } = await supabase
+          .from("token")
+          .select("*")
+          .order("created_at", { ascending: true })
+          .limit(1);
+
+        if (oldestTokenError) {
+          return NextResponse.json(
+            { error: oldestTokenError.message },
+            { status: 500 }
+          );
+        }
+
+        if (!oldestToken) {
+          return NextResponse.json(
+            { error: "No token found" },
+            { status: 500 }
+          );
+        }
+
+        const { data: updatedToken, error: updateTokenError } = await supabase
+          .from("token")
+          .update({ token: access_token, refresh_token: newRefreshToken })
+          .eq("id", oldestToken[0].id)
+          .select()
+          .single();
+
+        if (updateTokenError) {
+          return NextResponse.json(
+            { error: updateTokenError.message },
+            { status: 500 }
+          );
+        }
+
+        if (!updatedToken) {
+          return NextResponse.json(
+            { error: "Failed to update token" },
+            { status: 500 }
+          );
+        }
+
+        accessToken = access_token;
+      } catch (refreshError: any) {
+        // 리프레시 토큰 만료 에러 처리
+        if (
+          refreshError.response?.data?.error === "invalid_grant" ||
+          refreshError.response?.data?.error_code === "KOE322"
+        ) {
+          return NextResponse.json(
+            {
+              error: "Refresh token expired",
+              error_description:
+                "리프레시 토큰이 만료되었습니다. 카카오 OAuth 인증을 다시 진행해주세요.",
+              error_code: refreshError.response?.data?.error_code,
+              solution:
+                "카카오 OAuth 인증 후 POST /api/token 으로 새 토큰 저장",
+            },
+            { status: 401 }
+          );
+        }
+
+        // 기타 리프레시 토큰 에러
+        console.error("Refresh token error:", refreshError.response?.data);
+        return NextResponse.json(
+          {
+            error: "Failed to refresh token",
+            error_description: refreshError.response?.data?.error_description,
+            error_code: refreshError.response?.data?.error_code,
           },
-        });
-
-      if (refreshTokenResponse.status !== 200) {
-        return NextResponse.json(
-          { error: "Failed to refresh token" },
           { status: 500 }
         );
       }
-
-      if (!refreshTokenResponse.data) {
-        return NextResponse.json(
-          { error: "Failed to refresh token" },
-          { status: 500 }
-        );
-      }
-
-      const { access_token, refresh_token: newRefreshToken } =
-        refreshTokenResponse.data;
-
-      // created_at 이 가장 빠른 데이터 찾기
-      const { data: oldestToken, error: oldestTokenError } = await supabase
-        .from("token")
-        .select("*")
-        .order("created_at", { ascending: true })
-        .limit(1);
-
-      if (oldestTokenError) {
-        return NextResponse.json(
-          { error: oldestTokenError.message },
-          { status: 500 }
-        );
-      }
-
-      if (!oldestToken) {
-        return NextResponse.json({ error: "No token found" }, { status: 500 });
-      }
-
-      const { data: updatedToken, error: updateTokenError } = await supabase
-        .from("token")
-        .update({ token: access_token, refresh_token: newRefreshToken })
-        .eq("id", oldestToken[0].id)
-        .select()
-        .single();
-
-      if (updateTokenError) {
-        return NextResponse.json(
-          { error: updateTokenError.message },
-          { status: 500 }
-        );
-      }
-
-      if (!updatedToken) {
-        return NextResponse.json(
-          { error: "Failed to update token" },
-          { status: 500 }
-        );
-      }
-
-      accessToken = access_token;
     }
 
     // env 에 misunUUId 가 없으면 예외 발생
