@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { PUBLIC_URL } from "@/constants/allrecords.consts";
+import { env } from "@/env/t3-env";
 import { createClient } from "./supabase/server";
 
 export async function getUser() {
@@ -14,7 +14,7 @@ export async function getUser() {
 }
 
 const serverApi = axios.create({
-  baseURL: PUBLIC_URL ?? process?.env?.NEXT_PUBLIC_VERCEL_URL ?? "/",
+  baseURL: env.NEXT_PUBLIC_URL ?? process?.env?.NEXT_PUBLIC_VERCEL_URL ?? "/",
 });
 
 serverApi.interceptors.response.use(

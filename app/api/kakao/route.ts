@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance, type AxiosResponse } from "axios";
 import { type NextRequest, NextResponse } from "next/server";
-import { PUBLIC_URL } from "@/constants/allrecords.consts";
+import { env } from "@/env/t3-env";
 import { createClient } from "@/lib/supabase/server";
 import type {
   HealthCheckResponse,
@@ -11,10 +11,10 @@ import type {
   TemplateObject,
 } from "@/types/allrecords.types";
 
-const misunUUId = process.env.MISUN_UUID;
+const misunUUId = env.MISUN_UUID;
 
 const url =
-  PUBLIC_URL ?? // Set this to your site URL in production env.
+  env.NEXT_PUBLIC_URL ?? // Set this to your site URL in production env.
   process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
   "http://localhost:3000/";
 
@@ -126,7 +126,7 @@ const retrySendMessageAndReturnException = async (
 };
 
 export async function POST(req: NextRequest) {
-  const kakaoClientId = process.env.KAKAO_REST_API_KEY;
+  const kakaoClientId = env.KAKAO_REST_API_KEY;
 
   if (!kakaoClientId) {
     return NextResponse.json(

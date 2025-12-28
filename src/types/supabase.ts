@@ -6,9 +6,6 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-// Enum 타입을 먼저 정의하여 자기 참조 문제 해결
-export type RecordsEnum = "poolsoop" | "ilsang" | "grim"
-
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
@@ -19,7 +16,7 @@ export type Database = {
     Tables: {
       allrecords: {
         Row: {
-          category: RecordsEnum | null
+          category: Database["public"]["Enums"]["records"] | null
           created_at: string
           description: string
           id: string
@@ -32,7 +29,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          category?: RecordsEnum | null
+          category?: Database["public"]["Enums"]["records"] | null
           created_at?: string
           description?: string
           id?: string
@@ -45,7 +42,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          category?: RecordsEnum | null
+          category?: Database["public"]["Enums"]["records"] | null
           created_at?: string
           description?: string
           id?: string
@@ -86,6 +83,39 @@ export type Database = {
           is_select?: boolean
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      patterns: {
+        Row: {
+          created_at: string
+          data: Json
+          height: number
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+          width: number
+        }
+        Insert: {
+          created_at?: string
+          data: Json
+          height: number
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+          width: number
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          height?: number
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          width?: number
         }
         Relationships: []
       }

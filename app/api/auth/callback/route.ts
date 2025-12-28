@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { env } from "@/env/t3-env";
 
 export async function GET(request: Request) {
   // console.log("callback 에서 받은 request =>", request);
@@ -12,8 +13,8 @@ export async function GET(request: Request) {
   if (code) {
     const cookieStore = await cookies();
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      env.SUPABASE_URL!,
+      env.SUPABASE_PUBLISHABLE_KEY!,
       {
         cookies: {
           getAll() {

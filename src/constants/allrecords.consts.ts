@@ -21,7 +21,3 @@ export const CHECKBOX_CATEGORY = [
     id: "grim",
   },
 ] as const;
-
-export const PUBLIC_URL = process.env.NEXT_PUBLIC_URL;
-
-export const EUN_MAIL = process.env.ADMIN_EMAIL_1;

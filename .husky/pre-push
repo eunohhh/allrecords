@@ -1,3 +1,29 @@
 #!/bin/sh
-export PATH="/opt/homebrew/bin:$PATH"
-pnpm build || exit 1
+. "$(dirname "$0")/_/husky.sh"
+set -e
+
+# PATH 설정 (GUI 클라이언트를 위한)
+export PATH="/usr/local/bin:/opt/homebrew/bin:$HOME/.nvm/versions/node/$(ls -t $HOME/.nvm/versions/node 2>/dev/null | head -1)/bin:$PATH"
+
+# pnpm 필수 체크
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "push 실패: pnpm이 PATH에 없습니다."
+  echo "macOS는 보통 /opt/homebrew/bin 가 PATH에 있어야 하며, pnpm은 'brew install pnpm' 또는 'corepack enable'로 설치하세요."
+  exit 1
+fi
+
+echo "biome 설정을 최신 버전으로 마이그레이션합니다..."
+pnpm exec biome migrate --write
+
+# Check if biome.jsonc was changed by the migration
+if ! git diff --quiet biome.jsonc; then
+  echo "push 실패: biome migrate에 의해 biome.jsonc 파일이 업데이트되었습니다."
+  echo "변경된 biome.jsonc 파일을 스테이징(git add)한 후 다시 push 해주세요."
+  exit 1
+fi
+
+echo "린트 검사를 실행합니다..."
+pnpm lint
+
+echo "빌드 검사를 실행합니다..."
+pnpm build

@@ -1,5 +1,7 @@
 "use client";
 
+import type { ControllerRenderProps } from "react-hook-form";
+import type { z } from "zod";
 import {
   Select,
   SelectContent,
@@ -10,8 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CHECKBOX_CATEGORY } from "@/constants/allrecords.consts";
-import type { ControllerRenderProps } from "react-hook-form";
-import type { z } from "zod";
 import type { formSchema } from "../model/admin.schema";
 
 interface AdminSelectProps {

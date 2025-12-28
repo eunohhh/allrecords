@@ -1,7 +1,7 @@
-import { PUBLIC_URL } from "@/constants/allrecords.consts";
-import { createClient } from "@/lib/supabase/server";
 import type { Provider } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
+import { env } from "@/env/t3-env";
+import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   const getURL = () => {
     let url =
-      PUBLIC_URL ?? // Set this to your site URL in production env.
+      env.NEXT_PUBLIC_URL ?? // Set this to your site URL in production env.
       process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
       "http://localhost:3000/";
     // Make sure to include `https://` when not localhost.

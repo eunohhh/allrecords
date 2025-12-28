@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { EUN_MAIL } from "@/constants/allrecords.consts";
+import { env } from "@/env/t3-env";
 import { createClient } from "@/lib/supabase/server";
 
 interface TokenRequest {
@@ -9,7 +9,7 @@ interface TokenRequest {
 }
 
 export async function POST(request: NextRequest) {
-  const tokenDataUuid = process.env.TOKEN_DATA_UUID;
+  const tokenDataUuid = env.TOKEN_DATA_UUID;
 
   if (!tokenDataUuid) {
     return NextResponse.json(
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   const { token, refresh_token, user_email } =
     (await request.json()) as TokenRequest;
 
-  if (user_email !== EUN_MAIL) {
+  if (user_email !== env.ADMIN_EMAIL_1) {
     return NextResponse.json(
       { error: "토큰 요청 권한이 없는 사용자 입니다" },
       { status: 401 }

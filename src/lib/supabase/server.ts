@@ -1,5 +1,6 @@
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { env } from "@/env/t3-env";
 import type { Database } from "@/types/supabase";
 
 export async function createClient() {
@@ -7,8 +8,8 @@ export async function createClient() {
 
   // Database 타입을 명시적으로 지정 [[memory:6952077]]
   return createServerClient<Database, "public">(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    env.SUPABASE_URL!,
+    env.SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {

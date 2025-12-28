@@ -23,8 +23,8 @@ function AdminTemplate() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // console.log("event ===>", event);
-      // console.log("session ===>", session);
+      console.log("event ===>", event);
+      console.log("session ===>", session);
       if (
         (event === "SIGNED_IN" ||
           event === "TOKEN_REFRESHED" ||

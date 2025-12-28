@@ -1,5 +1,8 @@
 "use client";
 
+import type { User } from "@supabase/supabase-js";
+import { AtSign, ChevronUp, Disc3, User2 } from "lucide-react";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,9 +21,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import type { User } from "@supabase/supabase-js";
-import { AtSign, ChevronUp, Disc3, User2 } from "lucide-react";
-import Link from "next/link";
 
 const items = [
   {
@@ -43,7 +43,7 @@ function AdminSidebar({ user }: AdminSidebarProps) {
   return (
     <Sidebar>
       <SidebarHeader>
-        <span>AllRecords</span>
+        <span>gnyang</span>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
