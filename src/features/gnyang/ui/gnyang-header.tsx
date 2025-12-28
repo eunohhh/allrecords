@@ -2,11 +2,11 @@
 
 import type { Record } from "@/types/allrecords.types";
 
-interface RecordHeaderProps {
+interface GnyangHeaderProps {
   record: Record;
 }
 
-function RecordHeader({ record }: RecordHeaderProps) {
+function GnyangHeader({ record }: GnyangHeaderProps) {
   return (
     <div className="flex flex-col gap-4">
       {record.title.length > 0 && record.category !== "poolsoop" && (
@@ -19,4 +19,4 @@ function RecordHeader({ record }: RecordHeaderProps) {
   );
 }
 
-export default RecordHeader;
+export default GnyangHeader;

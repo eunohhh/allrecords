@@ -4,11 +4,11 @@ import Image from "next/image";
 import type { Json } from "@/types/supabase";
 import type { RecordImage } from "../model/record.type";
 
-interface RecordImagesProps {
+interface GnyangImagesProps {
   recordImages: Json[] | null;
 }
 
-function RecordImages({ recordImages }: RecordImagesProps) {
+function GnyangImages({ recordImages }: GnyangImagesProps) {
   return (
     <div className="flex flex-col gap-4">
       {recordImages?.map((image) =>
@@ -32,4 +32,4 @@ function RecordImages({ recordImages }: RecordImagesProps) {
   );
 }
 
-export default RecordImages;
+export default GnyangImages;

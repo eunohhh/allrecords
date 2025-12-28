@@ -8,16 +8,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { GnyangHeader, GnyangImages, useRecordQuery } from "@/features/gnyang";
 import LoadingStar from "@/features/home/ui/loading-star";
-import { RecordHeader, RecordImages, useRecordQuery } from "@/features/record";
 
-interface RecordModalProps {
+interface GnyangModalProps {
   slug: string | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
-function RecordModal({ slug, isOpen, onClose }: RecordModalProps) {
+function GnyangModal({ slug, isOpen, onClose }: GnyangModalProps) {
   const { data: record, isPending, error } = useRecordQuery(slug || "");
 
   if (error) {
@@ -51,8 +51,8 @@ function RecordModal({ slug, isOpen, onClose }: RecordModalProps) {
             </div>
           ) : (
             <div className="space-y-4">
-              <RecordHeader record={record} />
-              <RecordImages recordImages={record.images} />
+              <GnyangHeader record={record} />
+              <GnyangImages recordImages={record.images} />
             </div>
           )}
         </ScrollArea>
@@ -61,4 +61,4 @@ function RecordModal({ slug, isOpen, onClose }: RecordModalProps) {
   );
 }
 
-export default RecordModal;
+export default GnyangModal;

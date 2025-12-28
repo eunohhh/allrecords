@@ -1,8 +1,8 @@
 "use client";
 
 import { HomeFloating, HomeGrid } from "@/features/home";
+import GnyangModal from "@/features/home/ui/gnyang-modal";
 import H1 from "@/features/home/ui/h1";
-import RecordModal from "@/features/home/ui/record-modal";
 import { useContentParam } from "@/hooks/use-content-param";
 
 function HomeTemplate() {
@@ -17,7 +17,7 @@ function HomeTemplate() {
       <H1 />
       <HomeGrid />
       <HomeFloating />
-      <RecordModal slug={content} isOpen={isOpen} onClose={handleClose} />
+      <GnyangModal slug={content} isOpen={isOpen} onClose={handleClose} />
     </section>
   );
 }

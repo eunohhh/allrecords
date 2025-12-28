@@ -3,7 +3,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import QueryProvider from "@/lib/query-provider";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { uhbee } from "@/fonts/font";
+import { uhbee, uhbeeHyeki } from "@/fonts/font";
 
 export const metadata: Metadata = {
   title: {
@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${uhbee.className} antialiased`}>
+      <body className={`${uhbee.variable} ${uhbeeHyeki.variable} antialiased`}>
         <QueryProvider>
           <NuqsAdapter>{children}</NuqsAdapter>
         </QueryProvider>
