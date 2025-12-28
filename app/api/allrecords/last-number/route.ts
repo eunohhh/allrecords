@@ -1,10 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { getLastNumber } from "@/lib/supabase/crud";
 import { createClient } from "@/lib/supabase/server";
-import { Constants, type RecordsEnum } from "@/types/supabase";
+import { type Category } from "@/types/allrecords.types";
+import { Constants } from "@/types/supabase";
 
 // RecordsEnum 타입 가드 함수
-function isValidCategory(category: string): category is RecordsEnum {
-  return Constants.public.Enums.records.includes(category as RecordsEnum);
+function isValidCategory(category: string): category is Category {
+  return Constants.public.Enums.records.includes(category as Category);
 }
 
 export async function GET(request: NextRequest) {
@@ -34,36 +36,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 });
     }
 
-    // 해당 카테고리의 가장 큰 number 값을 가져오기
-    const { data: records, error: fetchError } = await supabase
-      .from("allrecords")
-      .select("number")
-      .eq("category", category)
-      .order("number", { ascending: false })
-      .limit(1);
+    const result = await getLastNumber(supabase, category);
 
-    if (fetchError) {
-      console.error("Error fetching last number:", fetchError);
-      return NextResponse.json(
-        { error: "Failed to fetch last number" },
-        { status: 500 }
-      );
-    }
-
-    // 마지막 순서 번호 계산 (레코드가 없으면 0, 있으면 최대값 + 1)
-    const lastNumber = records && records.length > 0 ? records[0].number : 0;
-    const nextNumber = lastNumber + 1;
-
-    return NextResponse.json({
-      lastNumber,
-      nextNumber,
-      category,
-    });
+    return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error("Error in last-number endpoint:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

@@ -1,44 +1,44 @@
+import { type NextRequest, NextResponse } from "next/server";
+import { getDesc, updateDesc } from "@/lib/supabase/crud";
 import { createClient } from "@/lib/supabase/server";
 import type { Desc } from "@/types/allrecords.types";
-import { type NextRequest, NextResponse } from "next/server";
 
 interface GetRecordParams {
   params: Promise<{ slug: string }>;
 }
 
 export async function GET(request: NextRequest, { params }: GetRecordParams) {
-  const supabase = await createClient();
-  const { slug } = await params;
-  const { data, error } = await supabase
-    .from("descs")
-    .select("*")
-    .eq("id", slug)
-    .single();
+  try {
+    const supabase = await createClient();
+    const { slug } = await params;
+    const desc = await getDesc(supabase, slug);
 
-  if (error) {
+    return NextResponse.json(desc, { status: 200 });
+  } catch (error) {
     console.error("Error getting desc:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const statusCode =
+      errorMessage.includes("No") || errorMessage.includes("not found")
+        ? 404
+        : 500;
+    return NextResponse.json({ error: errorMessage }, { status: statusCode });
   }
-
-  return NextResponse.json(data, { status: 200 });
 }
 
 export async function PUT(request: NextRequest, { params }: GetRecordParams) {
-  const { slug: id } = await params;
-  const supabase = await createClient();
-  const body: Desc = await request.json();
+  try {
+    const { slug: id } = await params;
+    const supabase = await createClient();
+    const body: Desc = await request.json();
 
-  const { data, error } = await supabase
-    .from("descs")
-    .update(body)
-    .eq("id", id)
-    .select()
-    .single();
+    const data = await updateDesc(supabase, id, body);
 
-  if (error) {
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
     console.error("Error updating desc:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
-
-  return NextResponse.json(data, { status: 200 });
 }

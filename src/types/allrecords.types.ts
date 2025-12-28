@@ -141,3 +141,5 @@ export interface MessageResponse {
 }
 
 export type Category = Database["public"]["Enums"]["records"];
+
+export const Categories = ["poolsoop", "ilsang", "grim"] as const;

@@ -1,20 +1,21 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { getAbout } from "@/lib/supabase/crud";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
-  const supabase = await createClient();
-  const { data, error } = await supabase.from("descs").select("*");
+  try {
+    const supabase = await createClient();
+    const about = await getAbout(supabase);
 
-  if (error) {
+    return NextResponse.json(about, { status: 200 });
+  } catch (error) {
     console.error("Error getting about:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const statusCode =
+      errorMessage.includes("No") || errorMessage.includes("not found")
+        ? 404
+        : 500;
+    return NextResponse.json({ error: errorMessage }, { status: statusCode });
   }
-
-  if (!data) {
-    return NextResponse.json({ error: "No data" }, { status: 404 });
-  }
-
-  const about = data.filter((desc) => desc.is_select);
-
-  return NextResponse.json(about[0], { status: 200 });
 }

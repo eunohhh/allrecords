@@ -1,6 +1,7 @@
 import axios, { type AxiosError, type AxiosResponse } from "axios";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { Record } from "@/types/allrecords.types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -10,22 +11,14 @@ const api = axios.create({
   baseURL: "/",
 });
 
-// api.interceptors.request.use((config) => {
-//   if (typeof window !== 'undefined') {
-//     const token = localStorage.getItem('token');
-//     if (token) {
-//       config.headers.set('Authorization', `Bearer ${token}`);
-//     }
-//   }
-//   return config;
-// });
-
 api.interceptors.response.use(
   <T>(response: AxiosResponse<T>): T => response.data,
   (error: AxiosError) => {
     return Promise.reject(error);
   }
 );
+
+export default api;
 
 export function formatDateToTZ(date: Date) {
   return date.toISOString().replace("T", " ").replace("Z", "+00");
@@ -43,4 +36,11 @@ export function sanitizeFilename(filename: string) {
     .substring(0, 200); // 길이 제한
 }
 
-export default api;
+export function shuffleArray(array: Record[]) {
+  const newArray = array.slice(); // 원본 배열 복제
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1)); // 0부터 i까지의 랜덤 인덱스
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]]; // 요소 교환 (ES6 구조 분해 할당)
+  }
+  return newArray;
+}
