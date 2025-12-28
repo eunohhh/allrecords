@@ -1,1 +1,1 @@
-allrecords main
+gnyang main

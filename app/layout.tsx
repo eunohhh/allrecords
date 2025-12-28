@@ -7,15 +7,15 @@ import { uhbee } from "@/fonts/font";
 
 export const metadata: Metadata = {
   title: {
-    default: "AllRecords",
-    template: "%s | AllRecords",
+    default: "gnyang",
+    template: "%s | gnyang",
   },
-  description: "AllRecords는 Misun의 모든 기록을 저장하는 공간입니다.",
-  metadataBase: new URL("https://allrecords.me"),
+  description: "gnyang는 Misun의 모든 기록을 저장하는 공간입니다.",
+  metadataBase: new URL("https://gnyang.me"),
   keywords: ["블로그", "만화", "고양이"],
-  authors: [{ name: "YiiiMisun", url: "https://allrecords.me" }],
+  authors: [{ name: "YiiiMisun", url: "https://gnyang.me" }],
   creator: "YiiiMisun",
-  publisher: "EunOh",
+  publisher: "eunoh",
 };
 
 export default function RootLayout({
