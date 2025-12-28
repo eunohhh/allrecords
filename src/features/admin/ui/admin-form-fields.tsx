@@ -215,7 +215,7 @@ function ThumbnailFormField({
             <FormControl>
               <div className="flex flex-col gap-2">
                 {field.value && (
-                  <div className="relative inline-block">
+                  <div className="relative inline-block w-fit">
                     <img
                       src={
                         typeof field.value === "string"
@@ -229,7 +229,7 @@ function ThumbnailFormField({
                       type="button"
                       variant="secondary"
                       size="sm"
-                      className="absolute top-1 right-1 h-6 w-6 rounded-full p-0"
+                      className="absolute top-1 right-1 h-4 w-4 rounded-full p-0 has-[>svg]:px-2"
                       onClick={() => field.onChange(null)}
                     >
                       <X />

@@ -1,5 +1,21 @@
 "use client";
 
+import {
+  type ColumnFiltersState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  type RowSelectionState,
+  type SortingState,
+  useReactTable,
+  type VisibilityState,
+} from "@tanstack/react-table";
+import { ChevronDown, Loader2 } from "lucide-react";
+import { parseAsInteger, useQueryState } from "nuqs";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,22 +33,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  type ColumnFiltersState,
-  type RowSelectionState,
-  type SortingState,
-  type VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { ChevronDown, Loader2 } from "lucide-react";
-import { parseAsInteger, useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { useAdminDescsQuery } from "../hooks/admin.queries";
 import { aboutColumns } from "../model/admin.columns";
 import { useAdminStore } from "../model/admin.store";
@@ -66,8 +66,8 @@ function AdminAboutDatatable() {
     error,
   } = useAdminDescsQuery({
     category: aboutCategory.join(","),
-    page: page ?? 1,
-    limit: 10,
+    page: 1,
+    limit: 1000, // 전체 데이터를 가져와서 클라이언트에서 페이지네이션
     search: "",
     sort: "created_at",
     order: "desc",
@@ -89,6 +89,10 @@ function AdminAboutDatatable() {
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination: {
+        pageIndex: (page ?? 1) - 1,
+        pageSize: 10,
+      },
     },
   });
 
@@ -203,10 +207,10 @@ function AdminAboutDatatable() {
         </div>
         <div className="space-x-2">
           <AdminPagination
-            page={table.getState().pagination.pageIndex + 1}
-            limit={table.getState().pagination.pageSize}
+            page={page ?? 1}
+            limit={10}
             total={table.getFilteredRowModel().rows.length}
-            path="/admin/about"
+            onPageChange={setPage}
           />
         </div>
       </div>

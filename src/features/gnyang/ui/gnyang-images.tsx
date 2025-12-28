@@ -1,29 +1,32 @@
 "use client";
 
-import Image from "next/image";
-import type { Json } from "@/types/supabase";
+import { Category } from "@/types/allrecords.types";
 import type { RecordImage } from "../model/record.type";
+import GnyangImage from "./gnyang-image";
 
 interface GnyangImagesProps {
-  recordImages: Json[] | null;
+  recordImages: RecordImage[] | null;
+  priorityCount?: number; // 우선 로딩할 이미지 개수 (기본값: 3)
+  type: Category;
 }
 
-function GnyangImages({ recordImages }: GnyangImagesProps) {
+function GnyangImages({
+  recordImages,
+  priorityCount = 3,
+  type,
+}: GnyangImagesProps) {
   return (
-    <div className="flex flex-col gap-4">
-      {recordImages?.map((image) =>
+    <div className="relative flex h-full flex-1 flex-col items-center justify-center gap-4">
+      {recordImages?.map((image, index) =>
         image && typeof image === "object" ? (
           <div
-            className="relative h-56 w-full sm:h-96"
+            className="relative h-full w-full"
             key={(image as RecordImage).id}
           >
-            <Image
-              src={(image as RecordImage).url}
-              alt={(image as RecordImage).desc}
-              fill
-              className="object-contain"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              priority
+            <GnyangImage
+              image={image as RecordImage}
+              priority={index < priorityCount}
+              type={type}
             />
           </div>
         ) : null

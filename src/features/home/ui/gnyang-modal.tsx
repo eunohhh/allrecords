@@ -8,8 +8,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { GnyangHeader, GnyangImages, useRecordQuery } from "@/features/gnyang";
-import LoadingStar from "@/features/home/ui/loading-star";
+import type { RecordImage } from "@/features/gnyang/model/record.type";
+import { Category } from "@/types/allrecords.types";
 
 interface GnyangModalProps {
   slug: string | null;
@@ -38,21 +40,29 @@ function GnyangModal({ slug, isOpen, onClose }: GnyangModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90svh] max-w-svw rounded-none sm:min-h-3xl sm:min-w-3xl sm:max-w-4xl">
-        <div className="h-2" />
+      <DialogContent className="flex max-h-[90svh] min-h-[70svh] max-w-svw flex-col justify-start rounded-none sm:min-w-3xl sm:max-w-4xl">
         <DialogHeader className="hidden">
           <DialogTitle>{record?.title}</DialogTitle>
           <DialogDescription>{record?.title}</DialogDescription>
         </DialogHeader>
-        <ScrollArea className="flex max-h-[calc(90svh-120px)] items-center justify-center">
-          {isPending ? (
+        <ScrollArea className="flex h-full items-start justify-center overflow-y-auto">
+          {isPending && !record && !error && isOpen && (
             <div className="flex items-center justify-center p-8">
-              <LoadingStar />
+              <Skeleton className="h-56 w-full sm:h-96" />
             </div>
-          ) : (
-            <div className="space-y-4">
+          )}
+          {!isOpen && (
+            <div className="flex items-center justify-center p-8">
+              <Skeleton className="h-56 w-full sm:h-96" />
+            </div>
+          )}
+          {!isPending && record && isOpen && (
+            <div className="relative flex h-full min-h-[70svh] flex-1 flex-col space-y-4">
               <GnyangHeader record={record} />
-              <GnyangImages recordImages={record.images} />
+              <GnyangImages
+                recordImages={record.images as RecordImage[]}
+                type={record.category as Category}
+              />
             </div>
           )}
         </ScrollArea>

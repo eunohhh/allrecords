@@ -35,7 +35,7 @@ export function useVirtualPagination<T>({
       setCurrentPage(1);
       prevItemsLengthRef.current = items.length;
     }
-  });
+  }, [items.length]);
 
   return {
     visibleItems,

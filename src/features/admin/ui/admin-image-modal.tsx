@@ -108,9 +108,9 @@ function AdminImageModal({
               : "이미지를 추가해주세요."}
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
           {image && (
-            <div className="relative flex items-center justify-center gap-2">
+            <div className="relative">
               <img
                 src={image.url || URL.createObjectURL(image.file!)}
                 alt="이미지"
@@ -129,7 +129,7 @@ function AdminImageModal({
             control={form.control}
             name="images"
             render={({ field }) => (
-              <>
+              <div className="relative flex flex-col items-center justify-center gap-2">
                 <input
                   type="file"
                   accept="image/*"
@@ -145,7 +145,7 @@ function AdminImageModal({
                   <Image />
                   <span>이미지 추가</span>
                 </Button>
-              </>
+              </div>
             )}
           />
         </div>

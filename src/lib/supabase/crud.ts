@@ -31,7 +31,7 @@ export async function getRecords(
     category = [],
   } = params;
   const offset = (page - 1) * limit;
-  const to = offset + limit;
+  const to = offset + limit - 1; // Supabase range는 inclusive이므로 -1
   const query = supabase.from("allrecords").select("*").range(offset, to);
   if (search) {
     query.textSearch("title", search);
@@ -132,7 +132,7 @@ export async function uploadThumbnail(
 ): Promise<string> {
   const thumbnailBuffer = await file.arrayBuffer();
   const processedThumbnailBuffer = await sharp(thumbnailBuffer)
-    .webp({ quality: 80 })
+    .webp({ quality: 30 })
     .toBuffer();
 
   const originalFileName = sanitizeFilename(file.name);
@@ -193,26 +193,31 @@ export async function processImagesForPost(
   imagesInfo: Omit<RecordImagePost, "file">[],
   imageFiles: File[]
 ): Promise<RecordImage[]> {
-  const uploadedImages: RecordImage[] = [];
+  try {
+    const uploadedImages: RecordImage[] = [];
 
-  for (let i = 0; i < imageFiles.length; i++) {
-    const file = imageFiles[i];
-    const info = imagesInfo[i];
+    for (let i = 0; i < imageFiles.length; i++) {
+      const file = imageFiles[i];
+      const info = imagesInfo[i];
 
-    if (!info) {
-      throw new Error("Image info not provided for all files");
+      if (!info) {
+        throw new Error("Image info not provided for all files");
+      }
+
+      const url = await uploadImage(supabase, file);
+
+      uploadedImages.push({
+        id: info.id,
+        url,
+        desc: info.desc,
+      });
     }
 
-    const url = await uploadImage(supabase, file);
-
-    uploadedImages.push({
-      id: info.id,
-      url,
-      desc: info.desc,
-    });
+    return uploadedImages;
+  } catch (error) {
+    console.error("Error processing images:", error);
+    throw new Error("Failed to process images");
   }
-
-  return uploadedImages;
 }
 
 export async function createRecord(supabase: SupabaseClient, record: Record) {

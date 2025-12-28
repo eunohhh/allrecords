@@ -14,23 +14,26 @@ interface AdminPaginationProps {
   page: number;
   limit: number;
   total: number;
-  path: string;
+  onPageChange: (page: number) => void;
 }
 
-function AdminPagination({ page, limit, total, path }: AdminPaginationProps) {
-  const pageSection = Math.ceil(total / limit);
+function AdminPagination({
+  page,
+  limit,
+  total,
+  onPageChange,
+}: AdminPaginationProps) {
+  const pageSection = Math.ceil(total / limit) || 1;
   const currentPage = page;
   const isFirstPage = currentPage === 1;
   const isLastPage = currentPage === pageSection;
 
-  const previousPage = () => {
-    if (isFirstPage) return;
-    return `${path}?page=${currentPage - 1}`;
-  };
-
-  const nextPage = () => {
-    if (isLastPage) return;
-    return `${path}?page=${currentPage + 1}`;
+  const handlePageClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    pageNum: number
+  ) => {
+    e.preventDefault();
+    onPageChange(pageNum);
   };
 
   return (
@@ -38,31 +41,40 @@ function AdminPagination({ page, limit, total, path }: AdminPaginationProps) {
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            href={previousPage()}
-            className="cursor-pointer bg-white"
+            href="#"
+            onClick={(e) => !isFirstPage && handlePageClick(e, currentPage - 1)}
+            className={cn(
+              "cursor-pointer bg-white",
+              isFirstPage && "pointer-events-none opacity-50"
+            )}
           />
         </PaginationItem>
         {Array.from({ length: pageSection }).map((_, index) => {
-          const page = index + 1;
+          const pageNum = index + 1;
           return (
-            <PaginationItem key={page}>
+            <PaginationItem key={pageNum}>
               <PaginationLink
-                href={`${path}?page=${page}`}
-                isActive={page === currentPage}
+                href="#"
+                onClick={(e) => handlePageClick(e, pageNum)}
+                isActive={pageNum === currentPage}
                 className={cn(
                   "cursor-pointer bg-white",
-                  page === currentPage && "bg-primary text-white"
+                  pageNum === currentPage && "bg-primary text-white"
                 )}
               >
-                {page}
+                {pageNum}
               </PaginationLink>
             </PaginationItem>
           );
         })}
         <PaginationItem>
           <PaginationNext
-            href={nextPage()}
-            className="cursor-pointer bg-white"
+            href="#"
+            onClick={(e) => !isLastPage && handlePageClick(e, currentPage + 1)}
+            className={cn(
+              "cursor-pointer bg-white",
+              isLastPage && "pointer-events-none opacity-50"
+            )}
           />
         </PaginationItem>
       </PaginationContent>

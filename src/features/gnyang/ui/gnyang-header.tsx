@@ -8,12 +8,12 @@ interface GnyangHeaderProps {
 
 function GnyangHeader({ record }: GnyangHeaderProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex h-full flex-col gap-4">
       {record.title.length > 0 && record.category !== "poolsoop" && (
-        <h1 className="font-bold text-2xl">{record.title}</h1>
+        <h1 className="font-bold text-lg sm:text-2xl">{record.title}</h1>
       )}
       {record.description.length > 0 && (
-        <p className="text-gray-500 text-sm">{record.description}</p>
+        <p className="text-gray-500 text-xs sm:text-sm">{record.description}</p>
       )}
     </div>
   );

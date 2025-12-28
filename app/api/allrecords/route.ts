@@ -7,7 +7,6 @@ import {
   uploadThumbnail,
 } from "@/lib/supabase/crud";
 import { createClient } from "@/lib/supabase/server";
-import { shuffleArray } from "@/lib/utils";
 import type {
   Category,
   Record,
@@ -35,7 +34,7 @@ export async function GET(request: NextRequest) {
       category: category as Category[],
     });
 
-    return NextResponse.json(shuffleArray(data), { status: 200 });
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error("Error getting records:", error);
     return NextResponse.json(

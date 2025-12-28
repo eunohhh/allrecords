@@ -1,9 +1,9 @@
 "use client";
 
-import type { DragEndEvent } from "@dnd-kit/core";
+import { type DragEndEvent } from "@dnd-kit/core";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
@@ -54,15 +54,16 @@ interface AdminModalProps {
 
 function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
   const { setSelectedItem } = useAdminStore();
+  const formRef = useRef<HTMLFormElement>(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [isThumbnailModalOpen, setIsThumbnailModalOpen] = useState(false);
   const {
-    mutate: postAdminRecords,
+    mutateAsync: postAdminRecords,
     isPending: isCreating,
     error: creatingError,
   } = useAdminRecordsMutation();
   const {
-    mutate: putAdminRecords,
+    mutateAsync: putAdminRecords,
     isPending: isUpdating,
     error: updatingError,
   } = useAdminRecordsPutMutation();
@@ -124,7 +125,7 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
     }
   };
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     const now = new Date();
     const newRecord: RecordPost = {
       ...data,
@@ -132,8 +133,8 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
       keywords: data.keywords.filter((keyword) => keyword.trim() !== ""), // 빈 키워드 제거
       created_at: formatDateToTZ(now),
       updated_at: formatDateToTZ(now),
-      images: data.images.map((image) => ({
-        id: image.id,
+      images: data.images.map((image, index) => ({
+        id: index, // 순서에 맞게 id 재할당
         url: image.file ? "" : image.url,
         file: image.file ? image.file : null,
         desc: image.desc,
@@ -143,9 +144,9 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
     };
     console.log("New record:", newRecord);
     if (record) {
-      putAdminRecords({ id: record.id, data: newRecord });
+      await putAdminRecords({ id: record.id, data: newRecord });
     } else {
-      postAdminRecords(newRecord);
+      await postAdminRecords(newRecord);
     }
     toast.success(record ? "글이 수정되었습니다." : "글이 추가되었습니다.");
     form.reset(defaultValues);
@@ -196,30 +197,41 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
     }
   }, [creatingError, updatingError]);
 
+  useEffect(() => {
+    if (!formRef.current) return;
+    if (fields.length > 0) {
+      formRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
+  }, [fields]);
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      {isCreating || isUpdating ? (
-        <div className="flex h-full items-center justify-center">
-          <Loader2 className="h-4 w-4 animate-spin" />
-        </div>
-      ) : (
-        <>
-          <DialogContent className="max-h-[90vh] w-full p-0 sm:max-w-3xl">
-            <div className="flex h-full max-h-[80vh] flex-col overflow-y-auto">
-              <DialogHeader className="px-6 pt-6">
-                <DialogTitle>{record ? "수정" : "생성"}</DialogTitle>
-                <DialogDescription className="hidden">
-                  {record ? "수정" : "생성"}할 내용을 입력해주세요.
-                </DialogDescription>
-              </DialogHeader>
+      <DialogContent className="max-h-[90vh] w-full p-2 sm:max-w-3xl">
+        <div className="flex h-full max-h-[80vh] flex-col overflow-y-auto">
+          <DialogHeader className="px-6 pt-6">
+            <DialogTitle>{record ? "수정" : "생성"}</DialogTitle>
+            <DialogDescription className="hidden">
+              {record ? "수정" : "생성"}할 내용을 입력해주세요.
+            </DialogDescription>
+          </DialogHeader>
+          {isCreating || isUpdating ? (
+            <div className="flex h-full min-h-[200px] items-center justify-center">
+              <Loader2 className="h-4 w-4 animate-spin" />
+            </div>
+          ) : (
+            <>
               <ScrollArea className="flex-1 px-6">
                 <Form {...form}>
                   <form
+                    ref={formRef}
                     onSubmit={form.handleSubmit(onSubmit, (errors) => {
                       console.error("Form validation errors:", errors);
                       toast.error("입력값을 확인해주세요.");
                     })}
-                    className="space-y-4 py-4"
+                    className="space-y-4 px-2 py-4"
                   >
                     <AdminFormFields
                       form={form}
@@ -256,21 +268,21 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
                   Save changes
                 </Button>
               </DialogFooter>
-            </div>
-          </DialogContent>
-          <AdminImageModal
-            open={isImageModalOpen}
-            setIsModalOpen={setIsImageModalOpen}
-            form={form}
-          />
-          <AdminImageModal
-            open={isThumbnailModalOpen}
-            setIsModalOpen={setIsThumbnailModalOpen}
-            form={form}
-            mode="thumbnail"
-          />
-        </>
-      )}
+            </>
+          )}
+        </div>
+      </DialogContent>
+      <AdminImageModal
+        open={isImageModalOpen}
+        setIsModalOpen={setIsImageModalOpen}
+        form={form}
+      />
+      <AdminImageModal
+        open={isThumbnailModalOpen}
+        setIsModalOpen={setIsThumbnailModalOpen}
+        form={form}
+        mode="thumbnail"
+      />
     </Dialog>
   );
 }

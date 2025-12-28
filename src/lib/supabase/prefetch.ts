@@ -15,7 +15,7 @@ export async function prefetchRecords(
     queryFn: async () => {
       const data = await getRecords(supabase, {
         page: 1,
-        limit: 40,
+        limit: 1000,
         search: "",
         sort: "created_at",
         order: "desc",

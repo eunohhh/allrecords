@@ -50,6 +50,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CHECKBOX_CATEGORY } from "@/constants/allrecords.consts";
+import { cn } from "@/lib/utils";
 import { Category } from "@/types/allrecords.types";
 import {
   useAdminRecordsQuery,
@@ -128,8 +129,8 @@ function AdminRecordsDatatable() {
     error,
   } = useAdminRecordsQuery({
     category: category.join(","),
-    page: page ?? 1,
-    limit: 10,
+    page: 1,
+    limit: 1000, // 전체 데이터를 가져와서 클라이언트에서 페이지네이션
     search: "",
     sort: "created_at",
     order: "desc",
@@ -170,6 +171,10 @@ function AdminRecordsDatatable() {
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination: {
+        pageIndex: (page ?? 1) - 1,
+        pageSize: 10,
+      },
     },
   });
 
@@ -317,8 +322,11 @@ function AdminRecordsDatatable() {
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <SortableTableRow key={row.id} row={row}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                      {row.getVisibleCells().map((cell, idx) => (
+                        <TableCell
+                          key={cell.id}
+                          className={cn(idx === 3 && "pl-6")}
+                        >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -351,10 +359,10 @@ function AdminRecordsDatatable() {
         </div>
         <div className="space-x-2">
           <AdminPagination
-            page={table.getState().pagination.pageIndex + 1}
-            limit={table.getState().pagination.pageSize}
+            page={page ?? 1}
+            limit={10}
             total={table.getFilteredRowModel().rows.length}
-            path="/admin/records"
+            onPageChange={setPage}
           />
         </div>
       </div>
