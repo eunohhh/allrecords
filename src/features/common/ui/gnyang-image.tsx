@@ -12,6 +12,7 @@ interface GnyangImageProps {
   type: Category;
   isNeedObjectCover: boolean;
   isPriority?: boolean;
+  loadedImageUrls: Set<string>;
 }
 
 function GnyangImage({
@@ -19,11 +20,10 @@ function GnyangImage({
   type,
   isNeedObjectCover,
   isPriority = false,
+  loadedImageUrls,
 }: GnyangImageProps) {
-  const loadedImageUrls = useRef(new Set<string>());
-
   const [isLoaded, setIsLoaded] = useState(() =>
-    loadedImageUrls.current.has(image.url)
+    loadedImageUrls.has(image.url)
   );
   const [showLoader, setShowLoader] = useState(false);
 
@@ -31,17 +31,17 @@ function GnyangImage({
 
   // priority 이미지가 이미 캐시되어 있는 경우 처리
   useEffect(() => {
-    if (loadedImageUrls.current.has(image.url)) {
+    if (loadedImageUrls.has(image.url)) {
       setIsLoaded(true);
       return;
     }
     if (imgRef.current?.complete) {
       setIsLoaded(true);
-      loadedImageUrls.current.add(image.url);
+      loadedImageUrls.add(image.url);
       return;
     }
     setIsLoaded(false);
-  }, [image.url]);
+  }, [image.url, loadedImageUrls]);
 
   useEffect(() => {
     if (isLoaded) {
@@ -54,13 +54,13 @@ function GnyangImage({
 
   const handleLoad = () => {
     setIsLoaded(true);
-    loadedImageUrls.current.add(image.url);
+    loadedImageUrls.add(image.url);
   };
 
   const handleError = () => {
     // 에러 발생 시에도 로더를 숨김
     setIsLoaded(true);
-    loadedImageUrls.current.add(image.url);
+    loadedImageUrls.add(image.url);
   };
 
   return (

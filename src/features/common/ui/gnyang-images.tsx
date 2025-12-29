@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Category } from "@/types/allrecords.types";
 import type { RecordImage } from "../model/record.type";
 import GnyangImage from "./gnyang-image";
 
 const PRELOAD_COUNT = 6;
 const PRELOAD_WIDTH = 720;
-const PRELOAD_QUALITY = 40;
+const PRELOAD_QUALITY = 50;
 
 interface GnyangImagesProps {
   recordImages: RecordImage[] | null;
@@ -27,6 +27,8 @@ function GnyangImages({
   isNeedObjectCover,
   shouldPreload = false,
 }: GnyangImagesProps) {
+  const loadedImageUrls = useRef(new Set<string>());
+
   useEffect(() => {
     if (!shouldPreload || !recordImages?.length) return;
 
@@ -37,8 +39,10 @@ function GnyangImages({
         PRELOAD_WIDTH,
         PRELOAD_QUALITY
       );
+      if (loadedImageUrls.current.has(preloadUrl)) return;
       const img = new Image();
       img.src = preloadUrl;
+      loadedImageUrls.current.add(preloadUrl);
     });
   }, [recordImages, shouldPreload]);
 
@@ -55,6 +59,7 @@ function GnyangImages({
               type={type}
               isNeedObjectCover={isNeedObjectCover}
               isPriority={index === 0}
+              loadedImageUrls={loadedImageUrls.current}
             />
           </div>
         ) : null
