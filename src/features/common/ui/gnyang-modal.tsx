@@ -74,7 +74,7 @@ function GnyangModal({
           <DialogDescription>{record?.title}</DialogDescription>
         </DialogHeader>
         {record && <GnyangHeader record={record} />}
-        <ScrollArea className="flex h-full items-start justify-center overflow-y-auto">
+        <ScrollArea className="min-h-0 flex-1 overflow-y-auto">
           {isPending && !record && !error && isOpen && (
             <div className="flex items-center justify-center p-8">
               <Skeleton className="h-56 w-full sm:h-96" />
@@ -91,6 +91,7 @@ function GnyangModal({
                 recordImages={record.images as RecordImage[]}
                 type={record.category as Category}
                 isNeedObjectCover={isNeedObjectCover}
+                shouldPreload={isOpen}
               />
             </div>
           )}

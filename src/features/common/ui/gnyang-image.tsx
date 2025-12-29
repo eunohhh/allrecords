@@ -11,26 +11,55 @@ interface GnyangImageProps {
   image: RecordImage;
   type: Category;
   isNeedObjectCover: boolean;
+  isPriority?: boolean;
 }
 
-function GnyangImage({ image, type, isNeedObjectCover }: GnyangImageProps) {
-  const [isLoaded, setIsLoaded] = useState(false);
+const loadedImageUrls = new Set<string>();
+
+function GnyangImage({
+  image,
+  type,
+  isNeedObjectCover,
+  isPriority = false,
+}: GnyangImageProps) {
+  const [isLoaded, setIsLoaded] = useState(() =>
+    loadedImageUrls.has(image.url)
+  );
+  const [showLoader, setShowLoader] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
   // priority 이미지가 이미 캐시되어 있는 경우 처리
   useEffect(() => {
+    if (loadedImageUrls.has(image.url)) {
+      setIsLoaded(true);
+      return;
+    }
     if (imgRef.current?.complete) {
       setIsLoaded(true);
+      loadedImageUrls.add(image.url);
+      return;
     }
-  }, []);
+    setIsLoaded(false);
+  }, [image.url]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      setShowLoader(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowLoader(true), 100);
+    return () => clearTimeout(timer);
+  }, [isLoaded]);
 
   const handleLoad = () => {
     setIsLoaded(true);
+    loadedImageUrls.add(image.url);
   };
 
   const handleError = () => {
     // 에러 발생 시에도 로더를 숨김
     setIsLoaded(true);
+    loadedImageUrls.add(image.url);
   };
 
   return (
@@ -58,10 +87,15 @@ function GnyangImage({ image, type, isNeedObjectCover }: GnyangImageProps) {
         )}
         onLoad={handleLoad}
         fill
-        priority
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 720px"
+        priority={isPriority}
+        loading={isPriority ? "eager" : "lazy"}
+        fetchPriority={isPriority ? "high" : "auto"}
+        placeholder="empty"
         onError={handleError}
       />
-      {!isLoaded && (
+
+      {showLoader && !isLoaded && (
         <LoadingStar className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6" />
       )}
     </div>
