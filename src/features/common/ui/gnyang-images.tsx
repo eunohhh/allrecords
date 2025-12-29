@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { Category } from "@/types/allrecords.types";
 import type { RecordImage } from "../model/record.type";
 import GnyangImage from "./gnyang-image";
@@ -14,6 +14,7 @@ interface GnyangImagesProps {
   type: Category;
   isNeedObjectCover: boolean;
   shouldPreload?: boolean;
+  loadedImageUrls: Set<string>;
 }
 
 function buildImageUrl(src: string, width: number, quality: number) {
@@ -26,9 +27,8 @@ function GnyangImages({
   type,
   isNeedObjectCover,
   shouldPreload = false,
+  loadedImageUrls,
 }: GnyangImagesProps) {
-  const loadedImageUrls = useRef(new Set<string>());
-
   useEffect(() => {
     if (!shouldPreload || !recordImages?.length) return;
 
@@ -39,12 +39,12 @@ function GnyangImages({
         PRELOAD_WIDTH,
         PRELOAD_QUALITY
       );
-      if (loadedImageUrls.current.has(preloadUrl)) return;
+      if (loadedImageUrls.has(preloadUrl)) return;
       const img = new Image();
       img.src = preloadUrl;
-      loadedImageUrls.current.add(preloadUrl);
+      loadedImageUrls.add(preloadUrl);
     });
-  }, [recordImages, shouldPreload]);
+  }, [recordImages, shouldPreload, loadedImageUrls.has, loadedImageUrls.add]);
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center gap-4">
@@ -59,7 +59,7 @@ function GnyangImages({
               type={type}
               isNeedObjectCover={isNeedObjectCover}
               isPriority={index === 0}
-              loadedImageUrls={loadedImageUrls.current}
+              loadedImageUrls={loadedImageUrls}
             />
           </div>
         ) : null

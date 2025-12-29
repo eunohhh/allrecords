@@ -19,6 +19,7 @@ interface GnyangModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialRecord?: Record;
+  loadedImageUrls: Set<string>;
 }
 
 function GnyangModal({
@@ -26,6 +27,7 @@ function GnyangModal({
   isOpen,
   onClose,
   initialRecord,
+  loadedImageUrls,
 }: GnyangModalProps) {
   const {
     data: record,
@@ -92,6 +94,7 @@ function GnyangModal({
                 type={record.category as Category}
                 isNeedObjectCover={isNeedObjectCover}
                 shouldPreload={isOpen}
+                loadedImageUrls={loadedImageUrls}
               />
             </div>
           )}

@@ -8,14 +8,12 @@ import useForesight from "@/hooks/use-foresight";
 import { cn } from "@/lib/utils";
 import type { Record } from "@/types/allrecords.types";
 
-// 이미 프리로드된 이미지 URL을 추적
-const preloadedUrls = new Set<string>();
-
 interface HomeGridCardProps {
   record: Record;
+  loadedImageUrls: Set<string>;
 }
 
-function HomeGridCard({ record }: HomeGridCardProps) {
+function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const { setContent } = useContentParam();
 
@@ -33,15 +31,15 @@ function HomeGridCard({ record }: HomeGridCardProps) {
         const url = (image as { url: string }).url;
 
         // 이미 프리로드된 URL은 건너뛰기
-        if (preloadedUrls.has(url)) return;
+        if (loadedImageUrls.has(url)) return;
 
         // 프리로드 실행
         const img = new Image();
         img.src = url;
-        preloadedUrls.add(url);
+        loadedImageUrls.add(url);
       }
     }
-  }, [record.images]);
+  }, [record.images, loadedImageUrls]);
 
   // ForesightJS로 마우스 움직임 예측하여 미리 이미지 로드
   const { elementRef: buttonRef } = useForesight<HTMLButtonElement>({

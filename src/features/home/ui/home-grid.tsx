@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import InfiniteScroll from "@/components/ui/infinite-scroll";
 import { CHECKBOX_CATEGORY } from "@/constants/allrecords.consts";
 import { useContentParam } from "@/hooks/use-content-param";
@@ -15,6 +15,7 @@ import LoadingStar from "./loading-star";
 function HomeGrid() {
   const { category } = useHomeStore();
   const { content, isOpen, setContent } = useContentParam();
+  const loadedImageUrls = useRef(new Set<string>());
 
   const handleClose = () => {
     setContent(null);
@@ -56,7 +57,11 @@ function HomeGrid() {
           <div className="grid grid-cols-3 justify-items-center gap-1 sm:grid-cols-4 sm:gap-4 md:grid-cols-5 lg:grid-cols-6">
             {isPending && visibleItems.length === 0 && <LoadingStar />}
             {visibleItems.map((record) => (
-              <HomeGridCard key={record.id} record={record} />
+              <HomeGridCard
+                key={record.id}
+                record={record}
+                loadedImageUrls={loadedImageUrls.current}
+              />
             ))}
           </div>
         </InfiniteScroll>
@@ -71,6 +76,7 @@ function HomeGrid() {
         isOpen={isOpen}
         onClose={handleClose}
         initialRecord={visibleItems.find((record) => record.slug === content)}
+        loadedImageUrls={loadedImageUrls.current}
       />
     </>
   );
