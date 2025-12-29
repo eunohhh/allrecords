@@ -38,12 +38,10 @@ function GnyangModal({
     // 숫자를 추출하여 27 이상 45 이하인 경우에만 true 를 반환
     const twentysevenTofourtyfive = (record?.images as RecordImage[])?.some(
       (image) => {
-        const number = image.desc.match(/\d+/);
-        return (
-          number?.[0] &&
-          parseInt(number[0], 10) >= 27 &&
-          parseInt(number[0], 10) <= 45
-        );
+        const match = image.desc.match(/^일상-(\d+)/);
+        if (!match?.[1]) return false;
+        const number = parseInt(match[1], 10);
+        return number >= 27 && number <= 45;
       }
     );
     return twentysevenTofourtyfive;
