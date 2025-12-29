@@ -41,12 +41,14 @@ function GnyangImage({
   return (
     <div
       className={cn(
-        "relative flex max-h-96 w-full items-center justify-center sm:h-[460px]",
+        "relative flex min-h-[200px] w-full items-center justify-center sm:min-h-[300px]",
         {
           "h-[480px] min-h-[480px] sm:h-[520px] sm:max-h-[520px]":
             type === "grim",
-          "h-[300px] sm:h-[682px] sm:max-h-[682px]": type === "ilsang",
-          "h-[228px] sm:h-[500px]": isNeedObjectCover,
+          "h-[300px] min-h-[300px] sm:h-[682px] sm:max-h-[682px] sm:min-h-[400px]":
+            type === "ilsang",
+          "h-[228px] min-h-[228px] sm:h-[500px] sm:min-h-[300px]":
+            isNeedObjectCover,
         }
       )}
     >
