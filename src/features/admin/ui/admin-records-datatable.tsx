@@ -128,7 +128,7 @@ function AdminRecordsDatatable() {
     isPending,
     error,
   } = useAdminRecordsQuery({
-    category: category.join(","),
+    category: category,
     page: 1,
     limit: 1000, // 전체 데이터를 가져와서 클라이언트에서 페이지네이션
     search: "",
