@@ -7,6 +7,7 @@ import { useContentParam } from "@/hooks/use-content-param";
 import useForesight from "@/hooks/use-foresight";
 import { cn } from "@/lib/utils";
 import type { Record } from "@/types/allrecords.types";
+import { buildImageUrl, PRELOAD_QUALITY, PRELOAD_WIDTH } from "./home-grid";
 
 interface HomeGridCardProps {
   record: Record;
@@ -29,14 +30,15 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
         typeof (image as { url?: unknown }).url === "string"
       ) {
         const url = (image as { url: string }).url;
+        const preloadUrl = buildImageUrl(url, PRELOAD_WIDTH, PRELOAD_QUALITY);
 
         // 이미 프리로드된 URL은 건너뛰기
-        if (loadedImageUrls.has(url)) return;
+        if (loadedImageUrls.has(preloadUrl)) return;
 
         // 프리로드 실행
         const img = new Image();
-        img.src = url;
-        loadedImageUrls.add(url);
+        img.src = preloadUrl;
+        loadedImageUrls.add(preloadUrl);
       }
     }
   }, [record.images, loadedImageUrls]);

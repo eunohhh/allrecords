@@ -12,6 +12,15 @@ import HomeCheckbox from "./home-checkbox";
 import HomeGridCard from "./home-grid-card";
 import LoadingStar from "./loading-star";
 
+export const PRELOAD_COUNT = 6;
+export const PRELOAD_WIDTH = 720;
+export const PRELOAD_QUALITY = 50;
+
+export function buildImageUrl(src: string, width: number, quality: number) {
+  const joiner = src.includes("?") ? "&" : "?";
+  return `${src}${joiner}width=${width}&quality=${quality}`;
+}
+
 function HomeGrid() {
   const { category } = useHomeStore();
   const { content, isOpen, setContent } = useContentParam();

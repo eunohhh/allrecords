@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
+import {
+  buildImageUrl,
+  PRELOAD_COUNT,
+  PRELOAD_QUALITY,
+  PRELOAD_WIDTH,
+} from "@/features/home/ui/home-grid";
 import { Category } from "@/types/allrecords.types";
 import type { RecordImage } from "../model/record.type";
 import GnyangImage from "./gnyang-image";
-
-const PRELOAD_COUNT = 6;
-const PRELOAD_WIDTH = 720;
-const PRELOAD_QUALITY = 50;
 
 interface GnyangImagesProps {
   recordImages: RecordImage[] | null;
@@ -15,11 +17,6 @@ interface GnyangImagesProps {
   isNeedObjectCover: boolean;
   shouldPreload?: boolean;
   loadedImageUrls: Set<string>;
-}
-
-function buildImageUrl(src: string, width: number, quality: number) {
-  const joiner = src.includes("?") ? "&" : "?";
-  return `${src}${joiner}width=${width}&quality=${quality}`;
 }
 
 function GnyangImages({
