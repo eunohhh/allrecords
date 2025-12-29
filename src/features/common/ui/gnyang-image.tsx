@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import LoadingStar from "@/features/home/ui/loading-star";
 import { cn } from "@/lib/utils";
@@ -8,17 +9,11 @@ import type { RecordImage } from "../model/record.type";
 
 interface GnyangImageProps {
   image: RecordImage;
-  priority?: boolean; // 우선 로딩 여부 (처음 몇 개 이미지)
   type: Category;
   isNeedObjectCover: boolean;
 }
 
-function GnyangImage({
-  image,
-  priority = false,
-  type,
-  isNeedObjectCover,
-}: GnyangImageProps) {
+function GnyangImage({ image, type, isNeedObjectCover }: GnyangImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -41,7 +36,7 @@ function GnyangImage({
   return (
     <div
       className={cn(
-        "relative flex min-h-[200px] w-full items-center justify-center sm:min-h-[300px]",
+        "relative flex min-h-[300px] w-full items-center justify-center sm:min-h-[480px]",
         {
           "h-[480px] min-h-[480px] sm:h-[520px] sm:max-h-[520px]":
             type === "grim",
@@ -52,20 +47,19 @@ function GnyangImage({
         }
       )}
     >
-      <img
+      <Image
         ref={imgRef}
         src={image.url}
         alt={image.desc}
         className={cn(
           "h-full w-full object-contain transition-opacity duration-200",
           isLoaded ? "opacity-100" : "opacity-0",
-          type === "grim" && "min-h-[480px]",
-          isNeedObjectCover && "h-[228px] object-cover sm:h-full"
+          isNeedObjectCover && "object-cover"
         )}
         onLoad={handleLoad}
+        fill
+        priority
         onError={handleError}
-        loading={priority ? "eager" : "lazy"}
-        fetchPriority={priority ? "high" : "auto"}
       />
       {!isLoaded && (
         <LoadingStar className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6" />

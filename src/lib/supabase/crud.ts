@@ -103,7 +103,10 @@ export async function uploadImage(
 ): Promise<string> {
   const imageBuffer = await file.arrayBuffer();
   const processedImageBuffer = await sharp(imageBuffer)
-    .webp({ quality: 80 })
+    // .resize(720, null, {
+    //   withoutEnlargement: true, // 원본이 1024px보다 작으면 확대하지 않음
+    // })
+    .webp({ quality: 80, lossless: true })
     .toBuffer();
 
   const originalFileName = sanitizeFilename(file.name);

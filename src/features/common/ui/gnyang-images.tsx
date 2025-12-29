@@ -6,14 +6,12 @@ import GnyangImage from "./gnyang-image";
 
 interface GnyangImagesProps {
   recordImages: RecordImage[] | null;
-  priorityCount?: number; // 우선 로딩할 이미지 개수 (기본값: 3)
   type: Category;
   isNeedObjectCover: boolean;
 }
 
 function GnyangImages({
   recordImages,
-  priorityCount = 3,
   type,
   isNeedObjectCover,
 }: GnyangImagesProps) {
@@ -27,7 +25,6 @@ function GnyangImages({
           >
             <GnyangImage
               image={image as RecordImage}
-              priority={index < priorityCount}
               type={type}
               isNeedObjectCover={isNeedObjectCover}
             />
