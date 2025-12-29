@@ -26,10 +26,6 @@ function HomeGrid() {
   const { content, isOpen, setContent } = useContentParam();
   const loadedImageUrls = useRef(new Set<string>());
 
-  const handleClose = () => {
-    setContent(null);
-  };
-
   const {
     data: allRecords = [],
     isLoading: isPending,
@@ -40,6 +36,10 @@ function HomeGrid() {
     items: allRecords,
     itemsPerPage: 24, // 초기 로드 수 (2-3 스크린 분량)
   });
+
+  const handleClose = () => {
+    setContent(null);
+  };
 
   useEffect(() => {
     if (error) {
