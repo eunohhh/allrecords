@@ -88,7 +88,7 @@ function GnyangImage({
         )}
         onLoad={handleLoad}
         fill
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 720px"
+        sizes="(max-width: 768px) 375px, (max-width: 1024px) 375px, 375px"
         priority={isPriority}
         loading={isPriority ? "eager" : "lazy"}
         fetchPriority={isPriority ? "high" : "auto"}

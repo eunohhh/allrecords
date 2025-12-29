@@ -4,15 +4,14 @@ import {
   type ForesightRegisterResult,
 } from "js.foresight";
 import { useEffect, useRef } from "react";
-import { useIsMobile } from "./use-mobile";
 
 // ForesightJS 전역 설정 초기화 (모듈 로드 시 한 번만 실행)
 if (typeof window !== "undefined") {
   ForesightManager.initialize({
-    touchDeviceStrategy: "onTouchStart", // 모바일: 터치 시작 시 프리로드
+    touchDeviceStrategy: "viewport",
     enableMousePrediction: true, // 데스크톱: 마우스 예측
     enableScrollPrediction: true, // 스크롤 예측
-    scrollMargin: 150, // 스크롤 방향 150px 앞 감지
+    scrollMargin: 200,
   });
 }
 
@@ -21,16 +20,14 @@ export default function useForesight<T extends HTMLElement = HTMLElement>(
 ) {
   const elementRef = useRef<T>(null);
   const registerResults = useRef<ForesightRegisterResult | null>(null);
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!elementRef.current) return;
-    if (isMobile) return;
     registerResults.current = ForesightManager.instance.register({
       element: elementRef.current,
       ...options,
     });
-  }, [options, isMobile]);
+  }, [options]);
 
   return { elementRef, registerResults };
 }
