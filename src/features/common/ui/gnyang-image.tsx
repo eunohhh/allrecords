@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import LoadingStar from "@/features/home/ui/loading-star";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Category } from "@/types/allrecords.types";
 import type { RecordImage } from "../model/record.type";
@@ -27,6 +28,7 @@ function GnyangImage({
   );
   const [showLoader, setShowLoader] = useState(false);
 
+  const isMobile = useIsMobile();
   const imgRef = useRef<HTMLImageElement>(null);
 
   // priority 이미지가 이미 캐시되어 있는 경우 처리
@@ -93,7 +95,7 @@ function GnyangImage({
         loading={isPriority ? "eager" : "lazy"}
         fetchPriority={isPriority ? "high" : "auto"}
         placeholder="empty"
-        quality={40}
+        quality={isMobile ? 40 : 60}
         onError={handleError}
       />
 

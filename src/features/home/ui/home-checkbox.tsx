@@ -9,6 +9,12 @@ interface HomeCheckboxProps {
   id: "poolsoop" | "ilsang" | "grim";
 }
 
+const ALL_CATEGORIES: HomeCheckboxProps["id"][] = [
+  "poolsoop",
+  "ilsang",
+  "grim",
+];
+
 function HomeCheckbox({ label, id }: HomeCheckboxProps) {
   const { category, setCategory } = useHomeStore();
   const checked = category.includes(id);
@@ -20,7 +26,10 @@ function HomeCheckbox({ label, id }: HomeCheckboxProps) {
       return;
     }
     if (checked) {
-      if (category.length === 1) return;
+      if (category.length === 1) {
+        setCategory(ALL_CATEGORIES);
+        return;
+      }
       setCategory(category.filter((c) => c !== id));
       return;
     }
