@@ -1,8 +1,9 @@
 import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
+import { DEFAULT_LIMIT } from "@/constants/allrecords.consts";
 import {
   createRecord,
-  getRecords,
+  getRecordsSupabase,
   processImagesForPost,
   uploadThumbnail,
 } from "@/lib/supabase/crud";
@@ -19,15 +20,15 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const searchParams = request.nextUrl.searchParams;
     const page = searchParams.get("page") || 1;
-    const limit = searchParams.get("limit") || 40;
+    const limit = searchParams.get("limit");
     const search = searchParams.get("search") || "";
     const sort = searchParams.get("sort") || "created_at";
     const order = searchParams.get("order") || "desc";
     const category = searchParams.get("category")?.split(",") || [];
 
-    const data = await getRecords(supabase, {
+    const data = await getRecordsSupabase(supabase, {
       page: Number(page),
-      limit: Number(limit),
+      limit: Number(limit) || DEFAULT_LIMIT,
       search,
       sort,
       order,

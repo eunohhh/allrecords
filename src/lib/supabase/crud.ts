@@ -1,5 +1,6 @@
 import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 import sharp from "sharp";
+import { DEFAULT_LIMIT } from "@/constants/allrecords.consts";
 import { sanitizeFilename } from "@/lib/utils";
 import {
   Category,
@@ -18,13 +19,13 @@ interface GetRecordsParams {
   category?: Category[];
 }
 
-export async function getRecords(
+export async function getRecordsSupabase(
   supabase: SupabaseClient,
   params: GetRecordsParams
 ) {
   const {
     page = 1,
-    limit = 40,
+    limit = DEFAULT_LIMIT,
     search = "",
     sort = "created_at",
     order = "desc",

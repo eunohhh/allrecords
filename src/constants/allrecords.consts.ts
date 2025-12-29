@@ -1,3 +1,5 @@
+import { Category } from "@/types/allrecords.types";
+
 export const QUERY_KEY_RECORDS = "records";
 export const QUERY_KEY_ALL = "all";
 export const QUERY_KEY_RECORD = "record";
@@ -21,3 +23,14 @@ export const CHECKBOX_CATEGORY = [
     id: "grim",
   },
 ] as const;
+
+export const DEFAULT_LIMIT = 1000;
+
+export const DEFAULT_RECORDS_PARAMS = {
+  page: 1,
+  limit: DEFAULT_LIMIT,
+  search: "",
+  sort: "created_at",
+  order: "desc",
+  category: ["ilsang", "poolsoop", "grim"] as Category[],
+};

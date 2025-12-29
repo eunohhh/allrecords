@@ -1,10 +1,11 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { QueryClient } from "@tanstack/react-query";
 import {
+  DEFAULT_RECORDS_PARAMS,
   QUERY_KEY_ALL,
   QUERY_KEY_RECORDS,
 } from "@/constants/allrecords.consts";
-import { getRecords } from "./crud";
+import { getRecordsSupabase } from "./crud";
 
 export async function prefetchRecords(
   queryClient: QueryClient,
@@ -13,14 +14,7 @@ export async function prefetchRecords(
   await queryClient.prefetchQuery({
     queryKey: [QUERY_KEY_RECORDS, QUERY_KEY_ALL],
     queryFn: async () => {
-      const data = await getRecords(supabase, {
-        page: 1,
-        limit: 1000,
-        search: "",
-        sort: "created_at",
-        order: "desc",
-        category: [],
-      });
+      const data = await getRecordsSupabase(supabase, DEFAULT_RECORDS_PARAMS);
       return data;
     },
   });

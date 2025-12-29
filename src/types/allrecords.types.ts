@@ -9,7 +9,7 @@ export interface RecordsParams {
   search: string;
   sort: string;
   order: string;
-  category: string;
+  category: Category[];
 }
 
 export interface RecordImage {

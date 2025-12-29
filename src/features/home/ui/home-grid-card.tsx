@@ -5,9 +5,14 @@ import { useCallback, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useContentParam } from "@/hooks/use-content-param";
 import useForesight from "@/hooks/use-foresight";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import type { Record } from "@/types/allrecords.types";
-import { buildImageUrl, PRELOAD_QUALITY, PRELOAD_WIDTH } from "./home-grid";
+import {
+  buildImageUrl,
+  PRELOAD_TARGET_QUALITY,
+  PRELOAD_TARGET_WIDTH,
+} from "./home-grid";
 
 interface HomeGridCardProps {
   record: Record;
@@ -17,7 +22,7 @@ interface HomeGridCardProps {
 function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const { setContent } = useContentParam();
-
+  const isMobile = useIsMobile();
   // 상세 이미지들을 미리 로드하는 함수
   const preloadImages = useCallback(() => {
     if (!record.images || !Array.isArray(record.images)) return;
@@ -30,7 +35,11 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
         typeof (image as { url?: unknown }).url === "string"
       ) {
         const url = (image as { url: string }).url;
-        const preloadUrl = buildImageUrl(url, PRELOAD_WIDTH, PRELOAD_QUALITY);
+        const preloadUrl = buildImageUrl(
+          url,
+          PRELOAD_TARGET_WIDTH[isMobile ? "mobile" : "desktop"],
+          PRELOAD_TARGET_QUALITY[isMobile ? "mobile" : "desktop"]
+        );
 
         // 이미 프리로드된 URL은 건너뛰기
         if (loadedImageUrls.has(preloadUrl)) {
@@ -48,7 +57,7 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
         };
       }
     }
-  }, [record.images, loadedImageUrls]);
+  }, [record.images, loadedImageUrls, isMobile]);
 
   // ForesightJS로 마우스 움직임 예측하여 미리 이미지 로드
   const { elementRef: buttonRef } = useForesight<HTMLButtonElement>({

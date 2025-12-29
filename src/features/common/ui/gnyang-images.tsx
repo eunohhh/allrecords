@@ -4,9 +4,10 @@ import { useEffect } from "react";
 import {
   buildImageUrl,
   PRELOAD_COUNT,
-  PRELOAD_QUALITY,
-  PRELOAD_WIDTH,
+  PRELOAD_TARGET_QUALITY,
+  PRELOAD_TARGET_WIDTH,
 } from "@/features/home/ui/home-grid";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Category } from "@/types/allrecords.types";
 import type { RecordImage } from "../model/record.type";
 import GnyangImage from "./gnyang-image";
@@ -26,6 +27,7 @@ function GnyangImages({
   shouldPreload = false,
   loadedImageUrls,
 }: GnyangImagesProps) {
+  const isMobile = useIsMobile();
   useEffect(() => {
     if (!shouldPreload || !recordImages?.length) return;
 
@@ -33,15 +35,21 @@ function GnyangImages({
       if (!image?.url) return;
       const preloadUrl = buildImageUrl(
         image.url,
-        PRELOAD_WIDTH,
-        PRELOAD_QUALITY
+        PRELOAD_TARGET_WIDTH[isMobile ? "mobile" : "desktop"],
+        PRELOAD_TARGET_QUALITY[isMobile ? "mobile" : "desktop"]
       );
       if (loadedImageUrls.has(preloadUrl)) return;
       const img = new Image();
       img.src = preloadUrl;
       loadedImageUrls.add(preloadUrl);
     });
-  }, [recordImages, shouldPreload, loadedImageUrls.has, loadedImageUrls.add]);
+  }, [
+    recordImages,
+    shouldPreload,
+    loadedImageUrls.has,
+    loadedImageUrls.add,
+    isMobile,
+  ]);
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center gap-4">

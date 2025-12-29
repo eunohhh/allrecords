@@ -14,8 +14,14 @@ import HomeGridCard from "./home-grid-card";
 import LoadingStar from "./loading-star";
 
 export const PRELOAD_COUNT = 6;
-export const PRELOAD_WIDTH = 750;
-export const PRELOAD_QUALITY = 50;
+export const PRELOAD_TARGET_WIDTH = {
+  desktop: 750,
+  mobile: 1200,
+};
+export const PRELOAD_TARGET_QUALITY = {
+  desktop: 50,
+  mobile: 75,
+};
 
 /**
  * Next.js Image Optimization API URL을 생성합니다.

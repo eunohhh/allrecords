@@ -1,5 +1,5 @@
-import type { Category } from "@/types/allrecords.types";
 import { create } from "zustand";
+import type { Category } from "@/types/allrecords.types";
 
 interface HomeStore {
   category: Category[];

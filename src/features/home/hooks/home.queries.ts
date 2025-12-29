@@ -1,16 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import {
+  DEFAULT_RECORDS_PARAMS,
   QUERY_KEY_ALL,
   QUERY_KEY_RECORDS,
 } from "@/constants/allrecords.consts";
-import { shuffleArray } from "@/lib/utils";
-import type {
-  Category,
-  Desc,
-  Record,
-  RecordsParams,
-} from "@/types/allrecords.types";
+import type { Category, Desc, Record } from "@/types/allrecords.types";
 import { QUERY_KEY_DESC } from "./../../../constants/allrecords.consts";
 import { getDescs, getRecords } from "../apis/home.apis";
 
@@ -19,11 +14,10 @@ export const useAllRecordsQuery = () => {
   return useQuery<Record[], Error>({
     queryKey: [QUERY_KEY_RECORDS, QUERY_KEY_ALL],
     queryFn: async () => {
-      const data = await getRecords();
-      return shuffleArray(data);
+      const data = await getRecords(DEFAULT_RECORDS_PARAMS);
+      // return shuffleArray(data);
+      return data;
     },
-    staleTime: 1000 * 60 * 5, // 5분간 캐시 유지
-    gcTime: 1000 * 60 * 10, // 10분간 메모리 유지
   });
 };
 
@@ -52,14 +46,6 @@ export const useFilteredRecords = (selectedCategories: Category[]) => {
     isLoading,
     error,
   };
-};
-
-// 기존 API와의 호환성을 위한 레거시 훅 (사용하지 않는 것을 권장)
-export const useRecordsQuery = (params: RecordsParams) => {
-  return useQuery<Record[], Error>({
-    queryKey: [QUERY_KEY_RECORDS, params.category],
-    queryFn: () => getRecords(params),
-  });
 };
 
 export const useAboutQuery = () => {
