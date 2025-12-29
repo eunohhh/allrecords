@@ -46,7 +46,7 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
   // ForesightJS로 마우스 움직임 예측하여 미리 이미지 로드
   const { elementRef: buttonRef } = useForesight<HTMLButtonElement>({
     callback: preloadImages,
-    hitSlop: { top: 50, right: 50, bottom: 50, left: 50 }, // 요소 주변 50px 범위에서 예측
+    hitSlop: { top: 80, right: 80, bottom: 80, left: 80 }, // 요소 주변 80px 범위에서 예측
     name: `card-${record.slug}`,
   });
 
