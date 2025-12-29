@@ -13,8 +13,16 @@ const api = axios.create({
 
 api.interceptors.response.use(
   <T>(response: AxiosResponse<T>): T => response.data,
-  (error: AxiosError) => {
-    return Promise.reject(error);
+  (error: AxiosError<{ error?: string; message?: string }>) => {
+    // 서버에서 보낸 에러 메시지 추출
+    const serverMessage =
+      error.response?.data?.error ||
+      error.response?.data?.message ||
+      error.message ||
+      "알 수 없는 오류가 발생했습니다.";
+
+    const customError = new Error(serverMessage);
+    return Promise.reject(customError);
   }
 );
 

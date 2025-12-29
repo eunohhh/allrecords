@@ -79,7 +79,7 @@ function HomeGridCard({ record }: HomeGridCardProps) {
       type="button"
       onClick={handleClick}
       onFocus={preloadImages}
-      className="relative flex h-[calc(190/619*100svw)] w-full cursor-pointer items-center justify-center sm:h-[calc(272/1920*100svw)] sm:w-full"
+      className="relative flex aspect-square h-auto w-full cursor-pointer items-center justify-center"
     >
       <div className="relative h-full w-full overflow-hidden">
         <img

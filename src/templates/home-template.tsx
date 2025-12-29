@@ -1,23 +1,14 @@
 "use client";
 
 import { HomeFloating, HomeGrid } from "@/features/home";
-import GnyangModal from "@/features/home/ui/gnyang-modal";
 import H1 from "@/features/home/ui/h1";
-import { useContentParam } from "@/hooks/use-content-param";
 
 function HomeTemplate() {
-  const { content, isOpen, setContent } = useContentParam();
-
-  const handleClose = () => {
-    setContent(null);
-  };
-
   return (
     <section className="flex flex-col">
       <H1 />
       <HomeGrid />
       <HomeFloating />
-      <GnyangModal slug={content} isOpen={isOpen} onClose={handleClose} />
     </section>
   );
 }

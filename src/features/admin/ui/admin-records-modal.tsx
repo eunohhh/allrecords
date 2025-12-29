@@ -126,31 +126,40 @@ function AdminRecordsModal({ open, setIsModalOpen, record }: AdminModalProps) {
   };
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    const now = new Date();
-    const newRecord: RecordPost = {
-      ...data,
-      category: data.category[0] || null,
-      keywords: data.keywords.filter((keyword) => keyword.trim() !== ""), // 빈 키워드 제거
-      created_at: formatDateToTZ(now),
-      updated_at: formatDateToTZ(now),
-      images: data.images.map((image, index) => ({
-        id: index, // 순서에 맞게 id 재할당
-        url: image.file ? "" : image.url,
-        file: image.file ? image.file : null,
-        desc: image.desc,
-      })),
-      number: data.number,
-      thumbnail: data.thumbnail || null,
-    };
-    console.log("New record:", newRecord);
-    if (record) {
-      await putAdminRecords({ id: record.id, data: newRecord });
-    } else {
-      await postAdminRecords(newRecord);
+    try {
+      const now = new Date();
+      const newRecord: RecordPost = {
+        ...data,
+        category: data.category[0] || null,
+        keywords: data.keywords.filter((keyword) => keyword.trim() !== ""), // 빈 키워드 제거
+        created_at: formatDateToTZ(now),
+        updated_at: formatDateToTZ(now),
+        images: data.images.map((image, index) => ({
+          id: index, // 순서에 맞게 id 재할당
+          url: image.file ? "" : image.url,
+          file: image.file ? image.file : null,
+          desc: image.desc,
+        })),
+        number: data.number,
+        thumbnail: data.thumbnail || null,
+      };
+      console.log("New record:", newRecord);
+      if (record) {
+        await putAdminRecords({ id: record.id, data: newRecord });
+      } else {
+        await postAdminRecords(newRecord);
+      }
+      toast.success(record ? "글이 수정되었습니다." : "글이 추가되었습니다.");
+      form.reset(defaultValues);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Submit error:", error);
+      toast.error(
+        error instanceof Error
+          ? `저장에 실패했습니다: ${error.message}`
+          : "저장에 실패했습니다. 다시 시도해주세요."
+      );
     }
-    toast.success(record ? "글이 수정되었습니다." : "글이 추가되었습니다.");
-    form.reset(defaultValues);
-    setIsModalOpen(false);
   };
 
   useEffect(() => {

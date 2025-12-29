@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,18 +10,44 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { GnyangHeader, GnyangImages, useRecordQuery } from "@/features/gnyang";
-import type { RecordImage } from "@/features/gnyang/model/record.type";
-import { Category } from "@/types/allrecords.types";
+import { GnyangHeader, GnyangImages, useRecordQuery } from "@/features/common";
+import type { RecordImage } from "@/features/common/model/record.type";
+import { Category, Record } from "@/types/allrecords.types";
 
 interface GnyangModalProps {
   slug: string | null;
   isOpen: boolean;
   onClose: () => void;
+  initialRecord?: Record;
 }
 
-function GnyangModal({ slug, isOpen, onClose }: GnyangModalProps) {
-  const { data: record, isPending, error } = useRecordQuery(slug || "");
+function GnyangModal({
+  slug,
+  isOpen,
+  onClose,
+  initialRecord,
+}: GnyangModalProps) {
+  const {
+    data: record,
+    isPending,
+    error,
+  } = useRecordQuery(slug || "", initialRecord);
+
+  const isNeedObjectCover = useMemo(() => {
+    // desc 의 "일상-{숫자}" 패턴에서
+    // 숫자를 추출하여 27 이상 45 이하인 경우에만 true 를 반환
+    const twentysevenTofourtyfive = (record?.images as RecordImage[])?.some(
+      (image) => {
+        const number = image.desc.match(/\d+/);
+        return (
+          number?.[0] &&
+          parseInt(number[0], 10) >= 27 &&
+          parseInt(number[0], 10) <= 45
+        );
+      }
+    );
+    return twentysevenTofourtyfive;
+  }, [record?.images]);
 
   if (error) {
     return (
@@ -40,11 +67,15 @@ function GnyangModal({ slug, isOpen, onClose }: GnyangModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="flex max-h-[90svh] min-h-[70svh] max-w-svw flex-col justify-start rounded-none sm:min-w-3xl sm:max-w-4xl">
+      <DialogContent
+        className="flex max-h-[95svh] min-h-[70svh] max-w-svw flex-col justify-start rounded-none sm:min-w-[40svw] sm:max-w-3xl"
+        overlayClassName="bg-black/80"
+      >
         <DialogHeader className="hidden">
           <DialogTitle>{record?.title}</DialogTitle>
           <DialogDescription>{record?.title}</DialogDescription>
         </DialogHeader>
+        {record && <GnyangHeader record={record} />}
         <ScrollArea className="flex h-full items-start justify-center overflow-y-auto">
           {isPending && !record && !error && isOpen && (
             <div className="flex items-center justify-center p-8">
@@ -58,10 +89,10 @@ function GnyangModal({ slug, isOpen, onClose }: GnyangModalProps) {
           )}
           {!isPending && record && isOpen && (
             <div className="relative flex h-full min-h-[70svh] flex-1 flex-col space-y-4">
-              <GnyangHeader record={record} />
               <GnyangImages
                 recordImages={record.images as RecordImage[]}
                 type={record.category as Category}
+                isNeedObjectCover={isNeedObjectCover}
               />
             </div>
           )}

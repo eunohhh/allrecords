@@ -12,10 +12,10 @@ function AboutText() {
     <div className="flex flex-1 flex-col items-center justify-center text-[calc(34.5/768*100svw)] md:text-[calc(35/1920*100svw)]">
       <div className="flex w-full flex-col md:flex-row">
         <div className="flex h-full flex-col md:w-[45%]">
-          <section className="flex h-full border-b-2 pb-8 md:border-r-2 md:border-b-2 md:py-8 md:pr-8">
+          <section className="flex h-full border-b-2 border-dotted pb-8 md:border-r-2 md:border-b-2 md:py-8 md:pr-8">
             <p className="h-full whitespace-pre-line">{aboutText[0]}</p>
           </section>
-          <section className="flex h-full flex-col border-b-2 py-8 md:gap-3 md:border-r-2 md:border-b-0 md:py-8 md:pr-8">
+          <section className="flex h-full flex-col border-b-2 border-dotted py-8 md:gap-3 md:border-r-2 md:border-b-0 md:py-8 md:pr-8">
             <div className="relative aspect-[1043/140] w-[90%] max-w-[440px] md:max-w-none">
               <Image
                 src="/about01.webp"
@@ -28,7 +28,7 @@ function AboutText() {
           </section>
         </div>
         <div className="flex h-full flex-col md:w-[55%]">
-          <section className="flex flex-row-reverse justify-end gap-1 border-b-2 py-8 md:flex-row md:justify-start md:gap-10 md:border-b-2 md:py-8 md:pl-8">
+          <section className="flex flex-row-reverse justify-end gap-1 border-b-2 border-dotted py-8 md:flex-row md:justify-start md:gap-10 md:border-b-2 md:py-8 md:pl-8">
             <div className="relative w-[calc(146/768*100svw)] md:w-[calc(190/1920*100svw)]">
               <Image
                 src="/about02.webp"

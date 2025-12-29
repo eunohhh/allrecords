@@ -26,7 +26,7 @@ function HomeCheckbox({ label, id }: HomeCheckboxProps) {
       type="button"
       onClick={handleClick}
       className={cn(
-        "relative flex min-w-12 cursor-pointer flex-col items-center justify-center font-medium text-xl",
+        "relative flex min-w-12 cursor-pointer flex-col items-center justify-center font-medium text-sm sm:text-xl",
         checked && "text-black"
       )}
       aria-pressed={checked}
@@ -34,7 +34,7 @@ function HomeCheckbox({ label, id }: HomeCheckboxProps) {
     >
       <span className="relative z-10">{label}</span>
       {checked ? (
-        <div className="relative h-2 w-12 overflow-hidden">
+        <div className="relative h-2 w-8 overflow-hidden sm:w-12">
           <svg
             className="relative h-2 w-full"
             viewBox="0 0 100 8"
@@ -54,7 +54,7 @@ function HomeCheckbox({ label, id }: HomeCheckboxProps) {
           </svg>
         </div>
       ) : (
-        <div className="relative h-2 w-12 overflow-hidden" />
+        <div className="relative h-2 w-8 overflow-hidden sm:w-12" />
       )}
     </button>
   );
