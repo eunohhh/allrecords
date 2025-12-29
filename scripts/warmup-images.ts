@@ -3,6 +3,7 @@
 import { createClient } from "@supabase/supabase-js";
 
 const BASE_URL = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+const BYPASS_TOKEN = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 
 // Supabase 클라이언트 생성
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -51,18 +52,34 @@ async function getImageUrls(): Promise<string[]> {
 const WIDTHS = [640, 750, 828, 1080, 1200, 1920, 2048, 3840];
 const QUALITY = 75;
 
-async function warmupImage(src: string, width: number): Promise<void> {
+async function warmupImage(
+  src: string,
+  width: number,
+  retries = 2
+): Promise<void> {
   const url = `${BASE_URL}/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${QUALITY}`;
 
-  try {
-    const response = await fetch(url);
-    if (response.ok) {
-      console.log(`✓ Warmed: ${src} @ ${width}w`);
-    } else {
+  const headers: Record<string, string> = {};
+  if (BYPASS_TOKEN) {
+    headers["x-vercel-protection-bypass"] = BYPASS_TOKEN;
+  }
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(url, { headers });
+      if (response.ok) {
+        console.log(`✓ Warmed: ${src} @ ${width}w`);
+        return;
+      }
       console.error(`✗ Failed: ${src} @ ${width}w - ${response.status}`);
+      return;
+    } catch (error) {
+      if (attempt < retries) {
+        await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+        continue;
+      }
+      console.error(`✗ Error: ${src} @ ${width}w -`, error);
     }
-  } catch (error) {
-    console.error(`✗ Error: ${src} @ ${width}w -`, error);
   }
 }
 
