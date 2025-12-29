@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import InfiniteScroll from "@/components/ui/infinite-scroll";
 import { CHECKBOX_CATEGORY } from "@/constants/allrecords.consts";
+import { env } from "@/env/t3-env";
 import { useContentParam } from "@/hooks/use-content-param";
 import { useVirtualPagination } from "@/hooks/use-virtual-pagination";
 import GnyangModal from "../../common/ui/gnyang-modal";
@@ -16,9 +17,20 @@ export const PRELOAD_COUNT = 6;
 export const PRELOAD_WIDTH = 750;
 export const PRELOAD_QUALITY = 50;
 
+/**
+ * Next.js Image Optimization API URL을 생성합니다.
+ * @param src - 원본 이미지 URL
+ * @param width - 이미지 너비 (px)
+ * @param quality - 이미지 품질 (0-100)
+ * @returns Next.js Image Optimization API URL
+ * @example
+ * buildImageUrl("https://example.com/image.jpg", 750, 50)
+ * // => "https://yourdomain.com/_next/image?url=https%3A%2F%2Fexample.com%2Fimage.jpg&w=750&q=50"
+ */
 export function buildImageUrl(src: string, width: number, quality: number) {
-  const joiner = src.includes("?") ? "&" : "?";
-  return `${src}${joiner}width=${width}&quality=${quality}`;
+  const encodedUrl = encodeURIComponent(src);
+  const url = `${env.NEXT_PUBLIC_URL}/_next/image?url=${encodedUrl}&w=${width}&q=${quality}`;
+  return url;
 }
 
 function HomeGrid() {

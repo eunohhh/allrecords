@@ -93,7 +93,7 @@ function GnyangImage({
         loading={isPriority ? "eager" : "lazy"}
         fetchPriority={isPriority ? "high" : "auto"}
         placeholder="empty"
-        quality={50}
+        quality={40}
         onError={handleError}
       />
 
