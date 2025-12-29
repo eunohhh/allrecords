@@ -5,12 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start & sleep 5 && pnpm warmup",
+    "start": "next start",
     "lint": "pnpm biome lint",
     "prepare": "husky",
     "format": "pnpm biome format",
     "warmup": "[ -f .env.local ] && tsx --env-file=.env.local scripts/warmup-images.ts || tsx scripts/warmup-images.ts",
-    "postinstall": "pnpm warmup",
     "gentypes": "supabase gen types typescript --project-id \"htjzfdsizwacysfiwjcd\" --schema public > src/types/supabase.ts"
   },
   "dependencies": {
