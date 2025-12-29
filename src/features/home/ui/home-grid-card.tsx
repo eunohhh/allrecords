@@ -80,7 +80,7 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
           className={cn(
             "relative h-full w-full object-contain transition-opacity duration-200"
           )}
-          sizes="(max-width: 768px) 375px, (max-width: 1024px) 375px, 375px"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           fill
           priority
           quality={40}
