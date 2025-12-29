@@ -11,6 +11,7 @@ export function useVirtualPagination<T>({
 }: UseVirtualPaginationProps<T>) {
   const [currentPage, setCurrentPage] = useState(1);
   const prevItemsLengthRef = useRef(items.length);
+  const prevItemsRef = useRef(items);
 
   // 현재까지 보여줄 아이템들
   const visibleItems = useMemo(() => {
@@ -31,11 +32,17 @@ export function useVirtualPagination<T>({
 
   // items가 변경되면 페이지 리셋 (필터링 시)
   useEffect(() => {
+    if (prevItemsRef.current !== items) {
+      setCurrentPage(1);
+      prevItemsRef.current = items;
+      prevItemsLengthRef.current = items.length;
+      return;
+    }
     if (prevItemsLengthRef.current !== items.length) {
       setCurrentPage(1);
       prevItemsLengthRef.current = items.length;
     }
-  }, [items.length]);
+  }, [items]);
 
   return {
     visibleItems,

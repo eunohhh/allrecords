@@ -13,7 +13,7 @@ import HomeGridCard from "./home-grid-card";
 import LoadingStar from "./loading-star";
 
 export const PRELOAD_COUNT = 6;
-export const PRELOAD_WIDTH = 720;
+export const PRELOAD_WIDTH = 750;
 export const PRELOAD_QUALITY = 50;
 
 export function buildImageUrl(src: string, width: number, quality: number) {
@@ -25,6 +25,8 @@ function HomeGrid() {
   const { category } = useHomeStore();
   const { content, isOpen, setContent } = useContentParam();
   const loadedImageUrls = useRef(new Set<string>());
+  const prevCategoryKeyRef = useRef<string | null>(null);
+  const categoryKey = category.join("|");
 
   const {
     data: allRecords = [],
@@ -46,6 +48,16 @@ function HomeGrid() {
       console.error(error);
     }
   }, [error]);
+
+  useEffect(() => {
+    if (prevCategoryKeyRef.current === null) {
+      prevCategoryKeyRef.current = categoryKey;
+      return;
+    }
+    if (prevCategoryKeyRef.current === categoryKey) return;
+    prevCategoryKeyRef.current = categoryKey;
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [categoryKey]);
 
   return (
     <>

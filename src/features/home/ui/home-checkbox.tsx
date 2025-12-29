@@ -12,14 +12,20 @@ interface HomeCheckboxProps {
 function HomeCheckbox({ label, id }: HomeCheckboxProps) {
   const { category, setCategory } = useHomeStore();
   const checked = category.includes(id);
+  const allSelected = category.length === 3;
 
   const handleClick = useCallback(() => {
-    if (checked) {
-      setCategory(category.filter((c) => c !== id));
-    } else {
-      setCategory([...category, id]);
+    if (allSelected) {
+      setCategory([id]);
+      return;
     }
-  }, [checked, category, id, setCategory]);
+    if (checked) {
+      if (category.length === 1) return;
+      setCategory(category.filter((c) => c !== id));
+      return;
+    }
+    setCategory([...category, id]);
+  }, [allSelected, checked, category, id, setCategory]);
 
   return (
     <button

@@ -4,6 +4,7 @@ import {
   type ForesightRegisterResult,
 } from "js.foresight";
 import { useEffect, useRef } from "react";
+import { useIsMobile } from "./use-mobile";
 
 // ForesightJS 전역 설정 초기화 (모듈 로드 시 한 번만 실행)
 if (typeof window !== "undefined") {
@@ -20,15 +21,16 @@ export default function useForesight<T extends HTMLElement = HTMLElement>(
 ) {
   const elementRef = useRef<T>(null);
   const registerResults = useRef<ForesightRegisterResult | null>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!elementRef.current) return;
-
+    if (isMobile) return;
     registerResults.current = ForesightManager.instance.register({
       element: elementRef.current,
       ...options,
     });
-  }, [options]);
+  }, [options, isMobile]);
 
   return { elementRef, registerResults };
 }
