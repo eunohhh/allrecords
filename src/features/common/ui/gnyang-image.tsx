@@ -14,29 +14,30 @@ interface GnyangImageProps {
   isPriority?: boolean;
 }
 
-const loadedImageUrls = new Set<string>();
-
 function GnyangImage({
   image,
   type,
   isNeedObjectCover,
   isPriority = false,
 }: GnyangImageProps) {
+  const loadedImageUrls = useRef(new Set<string>());
+
   const [isLoaded, setIsLoaded] = useState(() =>
-    loadedImageUrls.has(image.url)
+    loadedImageUrls.current.has(image.url)
   );
   const [showLoader, setShowLoader] = useState(false);
+
   const imgRef = useRef<HTMLImageElement>(null);
 
   // priority 이미지가 이미 캐시되어 있는 경우 처리
   useEffect(() => {
-    if (loadedImageUrls.has(image.url)) {
+    if (loadedImageUrls.current.has(image.url)) {
       setIsLoaded(true);
       return;
     }
     if (imgRef.current?.complete) {
       setIsLoaded(true);
-      loadedImageUrls.add(image.url);
+      loadedImageUrls.current.add(image.url);
       return;
     }
     setIsLoaded(false);
@@ -53,13 +54,13 @@ function GnyangImage({
 
   const handleLoad = () => {
     setIsLoaded(true);
-    loadedImageUrls.add(image.url);
+    loadedImageUrls.current.add(image.url);
   };
 
   const handleError = () => {
     // 에러 발생 시에도 로더를 숨김
     setIsLoaded(true);
-    loadedImageUrls.add(image.url);
+    loadedImageUrls.current.add(image.url);
   };
 
   return (
@@ -92,10 +93,11 @@ function GnyangImage({
         loading={isPriority ? "eager" : "lazy"}
         fetchPriority={isPriority ? "high" : "auto"}
         placeholder="empty"
+        quality={50}
         onError={handleError}
       />
 
-      {showLoader && !isLoaded && (
+      {showLoader && (
         <LoadingStar className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6" />
       )}
     </div>

@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     loader: "custom",
     loaderFile: "./loader.ts",
-    qualities: [40, 75],
+    qualities: [40, 50, 75],
   },
 };
 

@@ -86,7 +86,7 @@ function GnyangModal({
             </div>
           )}
           {!isPending && record && isOpen && (
-            <div className="relative flex h-full min-h-[70svh] flex-1 flex-col space-y-4">
+            <div className="relative flex h-full min-h-[70svh] flex-1 flex-col items-center justify-center space-y-4">
               <GnyangImages
                 recordImages={record.images as RecordImage[]}
                 type={record.category as Category}

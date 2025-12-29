@@ -43,10 +43,13 @@ function GnyangImages({
   }, [recordImages, shouldPreload]);
 
   return (
-    <div className="relative flex w-full flex-col items-center justify-center gap-4">
+    <div className="relative flex h-full w-full flex-col items-center justify-center gap-4">
       {recordImages?.map((image, index) =>
         image && typeof image === "object" ? (
-          <div className="relative w-full" key={(image as RecordImage).id}>
+          <div
+            className="relative w-full flex-1 items-center justify-center"
+            key={(image as RecordImage).id}
+          >
             <GnyangImage
               image={image as RecordImage}
               type={type}
