@@ -7,7 +7,7 @@ function HomeFloating() {
   return (
     <div className="fixed right-2 bottom-1 flex flex-row items-center">
       <Link
-        href="/withcat"
+        href="/board"
         className="relative aspect-[173/135] h-24 w-22 sm:h-36 sm:w-32"
       >
         <Button
