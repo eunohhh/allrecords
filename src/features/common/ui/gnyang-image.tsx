@@ -10,9 +10,15 @@ interface GnyangImageProps {
   image: RecordImage;
   priority?: boolean; // 우선 로딩 여부 (처음 몇 개 이미지)
   type: Category;
+  isNeedObjectCover: boolean;
 }
 
-function GnyangImage({ image, priority = false, type }: GnyangImageProps) {
+function GnyangImage({
+  image,
+  priority = false,
+  type,
+  isNeedObjectCover,
+}: GnyangImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -35,9 +41,12 @@ function GnyangImage({ image, priority = false, type }: GnyangImageProps) {
   return (
     <div
       className={cn(
-        "relative flex h-96 w-full items-center justify-center sm:h-[440px]",
+        "relative flex max-h-96 w-full items-center justify-center sm:h-[460px]",
         {
-          "sm:h-[520px]": type === "grim",
+          "h-[480px] min-h-[480px] sm:h-[520px] sm:max-h-[520px]":
+            type === "grim",
+          "h-[300px] sm:h-[682px] sm:max-h-[682px]": type === "ilsang",
+          "h-[228px] sm:h-[500px]": isNeedObjectCover,
         }
       )}
     >
@@ -47,7 +56,9 @@ function GnyangImage({ image, priority = false, type }: GnyangImageProps) {
         alt={image.desc}
         className={cn(
           "h-full w-full object-contain transition-opacity duration-200",
-          isLoaded ? "opacity-100" : "opacity-0"
+          isLoaded ? "opacity-100" : "opacity-0",
+          type === "grim" && "min-h-[480px]",
+          isNeedObjectCover && "h-[228px] object-cover sm:h-full"
         )}
         onLoad={handleLoad}
         onError={handleError}

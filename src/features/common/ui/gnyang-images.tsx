@@ -8,12 +8,14 @@ interface GnyangImagesProps {
   recordImages: RecordImage[] | null;
   priorityCount?: number; // 우선 로딩할 이미지 개수 (기본값: 3)
   type: Category;
+  isNeedObjectCover: boolean;
 }
 
 function GnyangImages({
   recordImages,
   priorityCount = 3,
   type,
+  isNeedObjectCover,
 }: GnyangImagesProps) {
   return (
     <div className="relative flex h-full flex-1 flex-col items-center justify-center gap-4">
@@ -27,6 +29,7 @@ function GnyangImages({
               image={image as RecordImage}
               priority={index < priorityCount}
               type={type}
+              isNeedObjectCover={isNeedObjectCover}
             />
           </div>
         ) : null
