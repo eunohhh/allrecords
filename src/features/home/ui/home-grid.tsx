@@ -16,10 +16,12 @@ import LoadingStar from "./loading-star";
 export const PRELOAD_COUNT = 6;
 export const PRELOAD_TARGET_WIDTH = {
   desktop: 750,
+  tablet: 1080,
   mobile: 1200,
 };
 export const PRELOAD_TARGET_QUALITY = {
   desktop: 50,
+  tablet: 75,
   mobile: 75,
 };
 

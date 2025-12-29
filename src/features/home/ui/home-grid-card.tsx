@@ -25,9 +25,18 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
   const preloadImages = useCallback(() => {
     if (!record.images || !Array.isArray(record.images)) return;
 
-    // 호출 시점의 화면 크기를 확인 (콜백 생성 시점의 값이 아닌)
-    const currentIsMobile =
-      typeof window !== "undefined" && window.innerWidth < 768;
+    // 호출 시점의 화면 크기를 확인하여 디바이스 타입 결정
+    let deviceType: "mobile" | "tablet" | "desktop" = "desktop";
+    if (typeof window !== "undefined") {
+      const width = window.innerWidth;
+      if (width < 768) {
+        deviceType = "mobile";
+      } else if (width <= 1366) {
+        deviceType = "tablet";
+      } else {
+        deviceType = "desktop";
+      }
+    }
 
     for (const image of record.images) {
       if (
@@ -39,8 +48,8 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
         const url = (image as { url: string }).url;
         const preloadUrl = buildImageUrl(
           url,
-          PRELOAD_TARGET_WIDTH[currentIsMobile ? "mobile" : "desktop"],
-          PRELOAD_TARGET_QUALITY[currentIsMobile ? "mobile" : "desktop"]
+          PRELOAD_TARGET_WIDTH[deviceType],
+          PRELOAD_TARGET_QUALITY[deviceType]
         );
 
         // 이미 프리로드된 URL은 건너뛰기
