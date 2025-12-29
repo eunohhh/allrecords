@@ -2,8 +2,8 @@
 
 import ContactForm from "@/features/withcat/ui/contact-form";
 
-function WithCatTemplate() {
+function BoardTemplate() {
   return <ContactForm />;
 }
 
-export default WithCatTemplate;
+export default BoardTemplate;
