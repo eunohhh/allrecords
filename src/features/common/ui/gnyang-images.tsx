@@ -1,13 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import {
-  buildImageUrl,
-  PRELOAD_COUNT,
-  PRELOAD_TARGET_QUALITY,
-  PRELOAD_TARGET_WIDTH,
-} from "@/features/home/ui/home-grid";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { PRELOAD_COUNT } from "@/constants/allrecords.consts";
+import { buildImageUrl } from "@/lib/build-image-url";
+import { getPreloadImageParams } from "@/lib/preload-image";
 import { Category } from "@/types/allrecords.types";
 import type { RecordImage } from "../model/record.type";
 import GnyangImage from "./gnyang-image";
@@ -27,29 +23,27 @@ function GnyangImages({
   shouldPreload = false,
   loadedImageUrls,
 }: GnyangImagesProps) {
-  const isMobile = useIsMobile();
   useEffect(() => {
     if (!shouldPreload || !recordImages?.length) return;
 
+    const viewportWidth =
+      typeof window !== "undefined" ? window.innerWidth : 1200;
+    const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
+    const { width, quality } = getPreloadImageParams({
+      viewportWidth,
+      dpr,
+      scale: 1,
+    });
+
     recordImages.slice(0, PRELOAD_COUNT).forEach((image) => {
       if (!image?.url) return;
-      const preloadUrl = buildImageUrl(
-        image.url,
-        PRELOAD_TARGET_WIDTH[isMobile ? "mobile" : "desktop"],
-        PRELOAD_TARGET_QUALITY[isMobile ? "mobile" : "desktop"]
-      );
+      const preloadUrl = buildImageUrl(image.url, width, quality);
       if (loadedImageUrls.has(preloadUrl)) return;
       const img = new Image();
       img.src = preloadUrl;
       loadedImageUrls.add(preloadUrl);
     });
-  }, [
-    recordImages,
-    shouldPreload,
-    loadedImageUrls.has,
-    loadedImageUrls.add,
-    isMobile,
-  ]);
+  }, [recordImages, shouldPreload, loadedImageUrls]);
 
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center gap-4">

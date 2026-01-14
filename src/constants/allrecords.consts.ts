@@ -34,3 +34,18 @@ export const DEFAULT_RECORDS_PARAMS = {
   order: "desc",
   category: ["ilsang", "poolsoop", "grim"] as Category[],
 };
+
+export const PRELOAD_COUNT = 6;
+
+/**
+ * Next.js 기본 deviceSizes (next/image의 fill + sizes 조합에서 사용되는 후보 폭들)
+ * - 참고: scripts/warmup-images.ts 에서도 동일 후보를 사용 중
+ */
+export const NEXT_IMAGE_DEVICE_SIZES = [
+  640, 750, 828, 1080, 1200, 1920, 2048, 3840,
+] as const;
+
+/**
+ * 프리로드 시 사용할 기본 품질 (next.config.ts 의 images.qualities 범위 내)
+ */
+export const PRELOAD_DEFAULT_QUALITY = 75;

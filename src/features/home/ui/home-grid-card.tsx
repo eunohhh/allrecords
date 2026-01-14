@@ -5,13 +5,10 @@ import { useCallback, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useContentParam } from "@/hooks/use-content-param";
 import useForesight from "@/hooks/use-foresight";
+import { buildImageUrl } from "@/lib/build-image-url";
+import { getPreloadImageParams } from "@/lib/preload-image";
 import { cn } from "@/lib/utils";
 import type { Record } from "@/types/allrecords.types";
-import {
-  buildImageUrl,
-  PRELOAD_TARGET_QUALITY,
-  PRELOAD_TARGET_WIDTH,
-} from "./home-grid";
 
 interface HomeGridCardProps {
   record: Record;
@@ -25,18 +22,15 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
   const preloadImages = useCallback(() => {
     if (!record.images || !Array.isArray(record.images)) return;
 
-    // 호출 시점의 화면 크기를 확인하여 디바이스 타입 결정
-    let deviceType: "mobile" | "tablet" | "desktop" = "desktop";
-    if (typeof window !== "undefined") {
-      const width = window.innerWidth;
-      if (width < 768) {
-        deviceType = "mobile";
-      } else if (width <= 1366) {
-        deviceType = "tablet";
-      } else {
-        deviceType = "desktop";
-      }
-    }
+    const viewportWidth =
+      typeof window !== "undefined" ? window.innerWidth : 1200;
+    const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
+    const { width, quality } = getPreloadImageParams({
+      viewportWidth,
+      dpr,
+      // 모달/상세는 거의 풀폭에 가깝게 쓰이므로 1.0
+      scale: 1,
+    });
 
     for (const image of record.images) {
       if (
@@ -46,11 +40,7 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
         typeof (image as { url?: unknown }).url === "string"
       ) {
         const url = (image as { url: string }).url;
-        const preloadUrl = buildImageUrl(
-          url,
-          PRELOAD_TARGET_WIDTH[deviceType],
-          PRELOAD_TARGET_QUALITY[deviceType]
-        );
+        const preloadUrl = buildImageUrl(url, width, quality);
 
         // 이미 프리로드된 URL은 건너뛰기
         if (loadedImageUrls.has(preloadUrl)) {
