@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { IMAGE_SIZES } from "@/constants/allrecords.consts";
 
 const aboutText = [
   `그냥그냥\n\n그냥 적는다\n그냥 그린다\n그냥 만든다\n\n그냥 그렇게 하는 것이 좋아서`,
@@ -21,7 +22,7 @@ function AboutText() {
                 src="/about01.webp"
                 alt="about01"
                 fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                sizes={IMAGE_SIZES}
               />
             </div>
             <p className="h-full whitespace-pre-line">{aboutText[1]}</p>
@@ -34,7 +35,7 @@ function AboutText() {
                 src="/about02.webp"
                 alt="about02"
                 fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                sizes={IMAGE_SIZES}
                 className="aspect-[540/698] object-contain"
               />
             </div>
@@ -50,7 +51,7 @@ function AboutText() {
                   src="/about03.webp"
                   alt="about03"
                   fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  sizes={IMAGE_SIZES}
                   className="object-contain"
                 />
               </div>

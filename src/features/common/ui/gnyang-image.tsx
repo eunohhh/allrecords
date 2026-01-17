@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { IMAGE_SIZES } from "@/constants/allrecords.consts";
 import LoadingStar from "@/features/home/ui/loading-star";
 import { cn } from "@/lib/utils";
 import { Category } from "@/types/allrecords.types";
@@ -88,7 +89,7 @@ function GnyangImage({
         )}
         onLoad={handleLoad}
         fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        sizes={IMAGE_SIZES}
         priority={isPriority}
         loading={isPriority ? "eager" : "lazy"}
         fetchPriority={isPriority ? "high" : "auto"}

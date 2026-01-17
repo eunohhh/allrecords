@@ -49,3 +49,9 @@ export const NEXT_IMAGE_DEVICE_SIZES = [
  * 프리로드 시 사용할 기본 품질 (next.config.ts 의 images.qualities 범위 내)
  */
 export const PRELOAD_DEFAULT_QUALITY = 75;
+
+/**
+ * next/image 의 sizes 속성 값
+ */
+export const IMAGE_SIZES =
+  "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw";

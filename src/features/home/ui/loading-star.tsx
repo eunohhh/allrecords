@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { IMAGE_SIZES } from "@/constants/allrecords.consts";
 import { cn } from "@/lib/utils";
 
 interface LoadingStarProps {
@@ -13,12 +14,7 @@ function LoadingStar({ className }: LoadingStarProps) {
         className
       )}
     >
-      <Image
-        src="/loading.webp"
-        alt="loading-star"
-        fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-      />
+      <Image src="/loading.webp" alt="loading-star" fill sizes={IMAGE_SIZES} />
     </div>
   );
 }

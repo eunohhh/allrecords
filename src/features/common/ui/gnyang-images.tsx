@@ -2,8 +2,7 @@
 
 import { useEffect } from "react";
 import { PRELOAD_COUNT } from "@/constants/allrecords.consts";
-import { buildImageUrl } from "@/lib/build-image-url";
-import { getPreloadImageParams } from "@/lib/preload-image";
+import { preloadImages } from "@/lib/preload-image";
 import { Category } from "@/types/allrecords.types";
 import type { RecordImage } from "../model/record.type";
 import GnyangImage from "./gnyang-image";
@@ -26,23 +25,20 @@ function GnyangImages({
   useEffect(() => {
     if (!shouldPreload || !recordImages?.length) return;
 
-    const viewportWidth =
-      typeof window !== "undefined" ? window.innerWidth : 1200;
-    const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
-    const { width, quality } = getPreloadImageParams({
-      viewportWidth,
-      dpr,
-      scale: 1,
-    });
+    // 프리로드할 URL 추출 (이미 로드된 것은 제외)
+    const srcs = recordImages
+      .slice(0, PRELOAD_COUNT)
+      .filter((image) => image?.url && !loadedImageUrls.has(image.url))
+      .map((image) => image.url);
 
-    recordImages.slice(0, PRELOAD_COUNT).forEach((image) => {
-      if (!image?.url) return;
-      const preloadUrl = buildImageUrl(image.url, width, quality);
-      if (loadedImageUrls.has(preloadUrl)) return;
-      const img = new Image();
-      img.src = preloadUrl;
-      loadedImageUrls.add(preloadUrl);
-    });
+    if (srcs.length === 0) return;
+
+    // 프리로드 전에 URL 등록 (중복 호출 방지)
+    for (const src of srcs) {
+      loadedImageUrls.add(src);
+    }
+
+    preloadImages(srcs, { scale: 1 });
   }, [recordImages, shouldPreload, loadedImageUrls]);
 
   return (

@@ -3,10 +3,10 @@
 import NextImage from "next/image";
 import { useCallback, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { IMAGE_SIZES } from "@/constants/allrecords.consts";
 import { useContentParam } from "@/hooks/use-content-param";
 import useForesight from "@/hooks/use-foresight";
-import { buildImageUrl } from "@/lib/build-image-url";
-import { getPreloadImageParams } from "@/lib/preload-image";
+import { preloadImages } from "@/lib/preload-image";
 import { cn } from "@/lib/utils";
 import type { Record } from "@/types/allrecords.types";
 
@@ -19,19 +19,11 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const { setContent } = useContentParam();
   // 상세 이미지들을 미리 로드하는 함수
-  const preloadImages = useCallback(() => {
+  const handlePreloadImages = useCallback(() => {
     if (!record.images || !Array.isArray(record.images)) return;
 
-    const viewportWidth =
-      typeof window !== "undefined" ? window.innerWidth : 1200;
-    const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
-    const { width, quality } = getPreloadImageParams({
-      viewportWidth,
-      dpr,
-      // 모달/상세는 거의 풀폭에 가깝게 쓰이므로 1.0
-      scale: 1,
-    });
-
+    // 프리로드할 URL 추출 (이미 로드된 것은 제외)
+    const srcs: string[] = [];
     for (const image of record.images) {
       if (
         image &&
@@ -40,29 +32,26 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
         typeof (image as { url?: unknown }).url === "string"
       ) {
         const url = (image as { url: string }).url;
-        const preloadUrl = buildImageUrl(url, width, quality);
-
-        // 이미 프리로드된 URL은 건너뛰기
-        if (loadedImageUrls.has(preloadUrl)) {
-          continue;
+        if (!loadedImageUrls.has(url)) {
+          srcs.push(url);
         }
-        const img = new Image();
-        img.src = preloadUrl;
-        loadedImageUrls.add(preloadUrl);
-
-        img.onload = () => {
-          loadedImageUrls.add(preloadUrl);
-        };
-        img.onerror = () => {
-          loadedImageUrls.add(preloadUrl);
-        };
       }
     }
+
+    if (srcs.length === 0) return;
+
+    // 프리로드 전에 URL 등록 (중복 호출 방지)
+    for (const src of srcs) {
+      loadedImageUrls.add(src);
+    }
+
+    // 모달/상세는 거의 풀폭에 가깝게 쓰이므로 scale: 1
+    preloadImages(srcs, { scale: 1 });
   }, [record.images, loadedImageUrls]);
 
   // ForesightJS로 마우스 움직임 예측하여 미리 이미지 로드
   const { elementRef: buttonRef } = useForesight<HTMLButtonElement>({
-    callback: preloadImages,
+    callback: handlePreloadImages,
     hitSlop: { top: 80, right: 80, bottom: 80, left: 80 }, // 요소 주변 80px 범위에서 예측
     name: `card-${record.slug}`,
   });
@@ -79,7 +68,7 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
       ref={buttonRef}
       type="button"
       onClick={handleClick}
-      onFocus={preloadImages}
+      onFocus={handlePreloadImages}
       className="relative flex aspect-square h-auto w-full cursor-pointer items-center justify-center"
     >
       <div className="relative h-full w-full overflow-hidden">
@@ -90,7 +79,7 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
           className={cn(
             "relative h-full w-full object-contain transition-opacity duration-200"
           )}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          sizes={IMAGE_SIZES}
           fill
           priority
           quality={40}
