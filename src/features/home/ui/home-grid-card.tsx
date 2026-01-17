@@ -45,8 +45,8 @@ function HomeGridCard({ record, loadedImageUrls }: HomeGridCardProps) {
       loadedImageUrls.add(src);
     }
 
-    // 모달/상세는 거의 풀폭에 가깝게 쓰이므로 scale: 1
-    preloadImages(srcs, { scale: 1 });
+    // 실제 NextImage sizes와 동일하게 맞춰서 프리로드 폭 계산
+    preloadImages(srcs, { sizes: IMAGE_SIZES });
   }, [record.images, loadedImageUrls]);
 
   // ForesightJS로 마우스 움직임 예측하여 미리 이미지 로드

@@ -135,7 +135,6 @@ export function getPreloadImageParams({
   const safeViewportWidth = Math.max(1, viewportWidth);
   const safeDpr = clamp(dpr, 1, 3);
   const targetWidth = Math.ceil(safeViewportWidth * safeDpr * scale);
-
   const width = pickClosestGreaterOrEqual(targetWidth, NEXT_IMAGE_DEVICE_SIZES);
   return { width, quality };
 }
@@ -188,6 +187,7 @@ export async function preloadImages(
   const dpr =
     options.dpr ??
     (typeof window !== "undefined" ? window.devicePixelRatio : 1);
+
   const scale =
     options.scale ?? getScaleFromSizes(options.sizes, viewportWidth);
   const { width, quality } = getPreloadImageParams({

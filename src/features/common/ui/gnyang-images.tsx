@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { PRELOAD_COUNT } from "@/constants/allrecords.consts";
+import { IMAGE_SIZES, PRELOAD_COUNT } from "@/constants/allrecords.consts";
 import { preloadImages } from "@/lib/preload-image";
 import { Category } from "@/types/allrecords.types";
 import type { RecordImage } from "../model/record.type";
@@ -38,7 +38,8 @@ function GnyangImages({
       loadedImageUrls.add(src);
     }
 
-    preloadImages(srcs, { scale: 1 });
+    // 실제 NextImage sizes와 동일하게 맞춰서 프리로드 폭 계산
+    preloadImages(srcs, { sizes: IMAGE_SIZES });
   }, [recordImages, shouldPreload, loadedImageUrls]);
 
   return (
