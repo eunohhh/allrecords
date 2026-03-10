@@ -19,7 +19,7 @@ export function useGraphData(limit: number) {
         body: JSON.stringify({
           query: `query ($limit: Int!) {
             historianGraph(limit: $limit) {
-              nodes { id created title content sourcePath theme source kind era tags people }
+              nodes { id created title content sourcePath theme source kind era year tags people }
               edges { from to type }
             }
           }`,

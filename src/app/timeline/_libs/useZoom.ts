@@ -9,7 +9,8 @@ export function useZoomPan(svgRef: React.RefObject<SVGSVGElement | null>) {
   const isPinchingRef = useRef(false);
   const pinchTimerRef = useRef<number | null>(null);
 
-  const [transform, setTransform] = useState<ZoomTransform>(() => zoomIdentity);
+  const initialTransform = zoomIdentity.scale(0.6);
+  const [transform, setTransform] = useState<ZoomTransform>(() => initialTransform);
 
   useEffect(() => {
     const el = svgRef.current;
@@ -41,6 +42,9 @@ export function useZoomPan(svgRef: React.RefObject<SVGSVGElement | null>) {
     // disable default dblclick zoom (we'll implement our own)
     s.on('dblclick.zoom', null);
     s.call(z as any);
+
+    // Apply initial zoom-out transform
+    s.call((z as any).transform, initialTransform);
 
     zoomRef.current = z;
     zoomSelectionRef.current = s;

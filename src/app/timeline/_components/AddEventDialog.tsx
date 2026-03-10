@@ -25,6 +25,7 @@ export type AddEventForm = {
 	theme: string;
 	kind: string;
 	era: string;
+	year: string;
 	tags: string;
 	people: string;
 	source: string;
@@ -53,6 +54,7 @@ export function AddEventDialog(props: {
 	const themeId = useId();
 	const kindId = useId();
 	const eraId = useId();
+	const yearId = useId();
 	const tagsId = useId();
 	const peopleId = useId();
 	const sourceId = useId();
@@ -129,6 +131,16 @@ export function AddEventDialog(props: {
 							id={eraId}
 							value={f.era}
 							onChange={(e) => set({ era: e.target.value })}
+						/>
+					</div>
+
+					<div className="grid gap-1">
+						<Label htmlFor="new-year">year</Label>
+						<Input
+							id={yearId}
+							placeholder="e.g. 1999"
+							value={f.year}
+							onChange={(e) => set({ year: e.target.value })}
 						/>
 					</div>
 
@@ -212,6 +224,7 @@ export function AddEventDialog(props: {
 										theme: f.theme || null,
 										kind: f.kind || null,
 										era: f.era || null,
+										year: f.year && f.year.trim().length > 0 ? Number.parseInt(f.year.trim(), 10) : null,
 										tags: f.tags
 											.split(",")
 											.map((s) => s.trim())

@@ -48,6 +48,7 @@ export function DetailsDialog(props: {
               {n.source && <div className="mt-2 text-xs text-zinc-500">source: {n.source}</div>}
               {n.kind && <div className="mt-1 text-xs text-zinc-500">kind: {n.kind}</div>}
               {n.era && <div className="mt-1 text-xs text-zinc-500">era: {n.era}</div>}
+              {n.year != null && <div className="mt-1 text-xs text-zinc-500">year: {n.year}</div>}
 
               {n.tags && n.tags.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">

@@ -29,6 +29,7 @@ export async function POST(req: Request) {
         source?: string | null;
         kind?: string | null;
         era?: string | null;
+        year?: number | null;
         tags?: string[] | null;
         people?: string[] | null;
       };

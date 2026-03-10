@@ -8,6 +8,7 @@ export type HistorianEventNode = {
   source?: string | null;
   kind?: string | null;
   era?: string | null;
+  year?: number | null;
   tags?: string[];
   people?: string[];
 };

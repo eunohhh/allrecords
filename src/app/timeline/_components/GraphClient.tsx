@@ -23,7 +23,7 @@ export default function GraphClient() {
 
   const [showEvents, setShowEvents] = useState(true);
   const [showTopics, setShowTopics] = useState(true);
-  const [showTags, setShowTags] = useState(true);
+  const [showTags, setShowTags] = useState(false);
   const [showPeople, setShowPeople] = useState(true);
 
   const [form, setForm] = useState<AddEventForm>({
@@ -33,6 +33,7 @@ export default function GraphClient() {
     theme: '',
     kind: 'concept',
     era: '',
+    year: '',
     tags: '',
     people: '',
     source: 'Historian by OpenClaw',
