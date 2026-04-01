@@ -2,15 +2,23 @@ import { select } from 'd3-selection';
 import { type ZoomTransform, zoom, zoomIdentity } from 'd3-zoom';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export function useZoomPan(svgRef: React.RefObject<SVGSVGElement | null>) {
+export function useZoomPan(
+  svgRef: React.RefObject<SVGSVGElement | null>,
+  size: { w: number; h: number },
+) {
   const zoomRef = useRef<ReturnType<typeof zoom<SVGSVGElement, unknown>> | null>(null);
   const zoomSelectionRef = useRef<any>(null);
   const lastTapRef = useRef<{ t: number; x: number; y: number } | null>(null);
   const isPinchingRef = useRef(false);
   const pinchTimerRef = useRef<number | null>(null);
 
-  const initialTransform = zoomIdentity.scale(0.6);
-  const [transform, setTransform] = useState<ZoomTransform>(() => initialTransform);
+  const k0 = 0.6;
+  const computeInitialTransform = (w: number, h: number) =>
+    zoomIdentity.translate(w * (1 - k0) / 2, h * (1 - k0) / 2).scale(k0);
+
+  const [transform, setTransform] = useState<ZoomTransform>(() =>
+    computeInitialTransform(size.w, size.h),
+  );
 
   useEffect(() => {
     const el = svgRef.current;
@@ -43,8 +51,8 @@ export function useZoomPan(svgRef: React.RefObject<SVGSVGElement | null>) {
     s.on('dblclick.zoom', null);
     s.call(z as any);
 
-    // Apply initial zoom-out transform
-    s.call((z as any).transform, initialTransform);
+    // Apply initial zoom-out transform centered on the viewport
+    s.call((z as any).transform, computeInitialTransform(size.w, size.h));
 
     zoomRef.current = z;
     zoomSelectionRef.current = s;
@@ -63,7 +71,7 @@ export function useZoomPan(svgRef: React.RefObject<SVGSVGElement | null>) {
       }
       isPinchingRef.current = false;
     };
-  }, [svgRef]);
+  }, [svgRef, size.w, size.h]);
 
   const applyTransform = useCallback((t: ZoomTransform) => {
     const z = zoomRef.current;
@@ -73,8 +81,8 @@ export function useZoomPan(svgRef: React.RefObject<SVGSVGElement | null>) {
   }, []);
 
   const resetView = useCallback(() => {
-    applyTransform(zoomIdentity);
-  }, [applyTransform]);
+    applyTransform(computeInitialTransform(size.w, size.h));
+  }, [applyTransform, size.w, size.h]);
 
   const zoomInAt = useCallback(
     (clientX: number, clientY: number, factor = 1.6) => {

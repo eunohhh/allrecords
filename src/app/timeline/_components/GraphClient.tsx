@@ -61,7 +61,7 @@ export default function GraphClient() {
   >(null);
 
   const { transform, resetView, onSvgDoubleClick, onSvgPointerDown, applyTransform, isPinchingRef } =
-    useZoomPan(svgRef);
+    useZoomPan(svgRef, size);
 
   const { graph, error, isInitialLoading, fetchGraph } = useGraphData(limit);
 
