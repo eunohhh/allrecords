@@ -224,7 +224,10 @@ export function AddEventDialog(props: {
 										theme: f.theme || null,
 										kind: f.kind || null,
 										era: f.era || null,
-										year: f.year && f.year.trim().length > 0 ? Number.parseInt(f.year.trim(), 10) : null,
+										year:
+											f.year && f.year.trim().length > 0
+												? Number.parseInt(f.year.trim(), 10)
+												: null,
 										tags: f.tags
 											.split(",")
 											.map((s) => s.trim())
