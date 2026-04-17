@@ -1,141 +1,156 @@
-import { select } from 'd3-selection';
-import { type ZoomTransform, zoom, zoomIdentity } from 'd3-zoom';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { select } from "d3-selection";
+import { type ZoomTransform, zoom, zoomIdentity } from "d3-zoom";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-export function useZoomPan(svgRef: React.RefObject<SVGSVGElement | null>) {
-  const zoomRef = useRef<ReturnType<typeof zoom<SVGSVGElement, unknown>> | null>(null);
-  const zoomSelectionRef = useRef<any>(null);
-  const lastTapRef = useRef<{ t: number; x: number; y: number } | null>(null);
-  const isPinchingRef = useRef(false);
-  const pinchTimerRef = useRef<number | null>(null);
+export function useZoomPan(
+	svgRef: React.RefObject<SVGSVGElement | null>,
+	size: { w: number; h: number },
+) {
+	const zoomRef = useRef<ReturnType<
+		typeof zoom<SVGSVGElement, unknown>
+	> | null>(null);
+	const zoomSelectionRef = useRef<any>(null);
+	const lastTapRef = useRef<{ t: number; x: number; y: number } | null>(null);
+	const isPinchingRef = useRef(false);
+	const pinchTimerRef = useRef<number | null>(null);
 
-  const initialTransform = zoomIdentity.scale(0.6);
-  const [transform, setTransform] = useState<ZoomTransform>(() => initialTransform);
+	const k0 = 0.6;
+	const computeInitialTransform = useCallback(
+		(w: number, h: number) =>
+			zoomIdentity.translate((w * (1 - k0)) / 2, (h * (1 - k0)) / 2).scale(k0),
+		[],
+	);
 
-  useEffect(() => {
-    const el = svgRef.current;
-    if (!el) return;
+	const [transform, setTransform] = useState<ZoomTransform>(() =>
+		computeInitialTransform(size.w, size.h),
+	);
 
-    let raf = 0;
-    const z = zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.2, 6])
-      .on('zoom', (event) => {
-        // Detect pinch (multi-touch). We use this to prevent node-tap from opening details.
-        const se: any = event.sourceEvent;
-        const touches = se?.touches;
-        if (touches && touches.length >= 2) {
-          isPinchingRef.current = true;
-          if (pinchTimerRef.current) {
-            window.clearTimeout(pinchTimerRef.current);
-          }
-          pinchTimerRef.current = window.setTimeout(() => {
-            isPinchingRef.current = false;
-            pinchTimerRef.current = null;
-          }, 180);
-        }
+	useEffect(() => {
+		const el = svgRef.current;
+		if (!el) return;
 
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(() => setTransform(event.transform));
-      });
+		let raf = 0;
+		const z = zoom<SVGSVGElement, unknown>()
+			.scaleExtent([0.2, 6])
+			.on("zoom", (event) => {
+				// Detect pinch (multi-touch). We use this to prevent node-tap from opening details.
+				const se: any = event.sourceEvent;
+				const touches = se?.touches;
+				if (touches && touches.length >= 2) {
+					isPinchingRef.current = true;
+					if (pinchTimerRef.current) {
+						window.clearTimeout(pinchTimerRef.current);
+					}
+					pinchTimerRef.current = window.setTimeout(() => {
+						isPinchingRef.current = false;
+						pinchTimerRef.current = null;
+					}, 180);
+				}
 
-    const s = select(el);
-    // disable default dblclick zoom (we'll implement our own)
-    s.on('dblclick.zoom', null);
-    s.call(z as any);
+				cancelAnimationFrame(raf);
+				raf = requestAnimationFrame(() => setTransform(event.transform));
+			});
 
-    // Apply initial zoom-out transform
-    s.call((z as any).transform, initialTransform);
+		const s = select(el);
+		// disable default dblclick zoom (we'll implement our own)
+		s.on("dblclick.zoom", null);
+		s.call(z as any);
 
-    zoomRef.current = z;
-    zoomSelectionRef.current = s;
+		// Apply initial zoom-out transform centered on the viewport
+		s.call((z as any).transform, computeInitialTransform(size.w, size.h));
 
-    // Prevent the page from scrolling on touch while interacting with the graph.
-    s.style('touch-action', 'none');
+		zoomRef.current = z;
+		zoomSelectionRef.current = s;
 
-    return () => {
-      cancelAnimationFrame(raf);
-      s.on('.zoom', null);
-      zoomRef.current = null;
-      zoomSelectionRef.current = null;
-      if (pinchTimerRef.current) {
-        window.clearTimeout(pinchTimerRef.current);
-        pinchTimerRef.current = null;
-      }
-      isPinchingRef.current = false;
-    };
-  }, [svgRef]);
+		// Prevent the page from scrolling on touch while interacting with the graph.
+		s.style("touch-action", "none");
 
-  const applyTransform = useCallback((t: ZoomTransform) => {
-    const z = zoomRef.current;
-    const s = zoomSelectionRef.current;
-    if (!z || !s) return;
-    s.call((z as any).transform, t);
-  }, []);
+		return () => {
+			cancelAnimationFrame(raf);
+			s.on(".zoom", null);
+			zoomRef.current = null;
+			zoomSelectionRef.current = null;
+			if (pinchTimerRef.current) {
+				window.clearTimeout(pinchTimerRef.current);
+				pinchTimerRef.current = null;
+			}
+			isPinchingRef.current = false;
+		};
+	}, [svgRef, size.w, size.h, computeInitialTransform]);
 
-  const resetView = useCallback(() => {
-    applyTransform(zoomIdentity);
-  }, [applyTransform]);
+	const applyTransform = useCallback((t: ZoomTransform) => {
+		const z = zoomRef.current;
+		const s = zoomSelectionRef.current;
+		if (!z || !s) return;
+		s.call((z as any).transform, t);
+	}, []);
 
-  const zoomInAt = useCallback(
-    (clientX: number, clientY: number, factor = 1.6) => {
-      const el = svgRef.current;
-      if (!el) return;
+	const resetView = useCallback(() => {
+		applyTransform(computeInitialTransform(size.w, size.h));
+	}, [applyTransform, size.w, size.h, computeInitialTransform]);
 
-      const rect = el.getBoundingClientRect();
-      const cx = clientX - rect.left;
-      const cy = clientY - rect.top;
+	const zoomInAt = useCallback(
+		(clientX: number, clientY: number, factor = 1.6) => {
+			const el = svgRef.current;
+			if (!el) return;
 
-      const nextK = Math.min(6, Math.max(0.2, transform.k * factor));
-      const t = zoomIdentity.translate(transform.x, transform.y).scale(transform.k);
+			const rect = el.getBoundingClientRect();
+			const cx = clientX - rect.left;
+			const cy = clientY - rect.top;
 
-      // compute new transform so that (cx, cy) stays fixed
-      const p0x = (cx - t.x) / t.k;
-      const p0y = (cy - t.y) / t.k;
-      const nextX = cx - p0x * nextK;
-      const nextY = cy - p0y * nextK;
+			const nextK = Math.min(6, Math.max(0.2, transform.k * factor));
+			const t = zoomIdentity
+				.translate(transform.x, transform.y)
+				.scale(transform.k);
 
-      applyTransform(zoomIdentity.translate(nextX, nextY).scale(nextK));
-    },
-    [applyTransform, svgRef, transform.k, transform.x, transform.y],
-  );
+			// compute new transform so that (cx, cy) stays fixed
+			const p0x = (cx - t.x) / t.k;
+			const p0y = (cy - t.y) / t.k;
+			const nextX = cx - p0x * nextK;
+			const nextY = cy - p0y * nextK;
 
-  const onSvgDoubleClick = useCallback(
-    (e: React.MouseEvent<SVGSVGElement>) => {
-      e.preventDefault();
-      zoomInAt(e.clientX, e.clientY, 1.6);
-    },
-    [zoomInAt],
-  );
+			applyTransform(zoomIdentity.translate(nextX, nextY).scale(nextK));
+		},
+		[applyTransform, svgRef, transform.k, transform.x, transform.y],
+	);
 
-  const onSvgPointerDown = useCallback(
-    (e: React.PointerEvent<SVGSVGElement>) => {
-      if (e.pointerType !== 'touch') return;
+	const onSvgDoubleClick = useCallback(
+		(e: React.MouseEvent<SVGSVGElement>) => {
+			e.preventDefault();
+			zoomInAt(e.clientX, e.clientY, 1.6);
+		},
+		[zoomInAt],
+	);
 
-      const now = Date.now();
-      const prev = lastTapRef.current;
-      lastTapRef.current = { t: now, x: e.clientX, y: e.clientY };
+	const onSvgPointerDown = useCallback(
+		(e: React.PointerEvent<SVGSVGElement>) => {
+			if (e.pointerType !== "touch") return;
 
-      if (!prev) return;
+			const now = Date.now();
+			const prev = lastTapRef.current;
+			lastTapRef.current = { t: now, x: e.clientX, y: e.clientY };
 
-      const dt = now - prev.t;
-      const dx = Math.abs(e.clientX - prev.x);
-      const dy = Math.abs(e.clientY - prev.y);
+			if (!prev) return;
 
-      if (dt < 320 && dx < 24 && dy < 24) {
-        e.preventDefault();
-        zoomInAt(e.clientX, e.clientY, 1.6);
-      }
-    },
-    [zoomInAt],
-  );
+			const dt = now - prev.t;
+			const dx = Math.abs(e.clientX - prev.x);
+			const dy = Math.abs(e.clientY - prev.y);
 
-  return {
-    transform,
-    applyTransform,
-    resetView,
-    zoomInAt,
-    onSvgDoubleClick,
-    onSvgPointerDown,
-    isPinchingRef,
-  };
+			if (dt < 320 && dx < 24 && dy < 24) {
+				e.preventDefault();
+				zoomInAt(e.clientX, e.clientY, 1.6);
+			}
+		},
+		[zoomInAt],
+	);
+
+	return {
+		transform,
+		applyTransform,
+		resetView,
+		zoomInAt,
+		onSvgDoubleClick,
+		onSvgPointerDown,
+		isPinchingRef,
+	};
 }
