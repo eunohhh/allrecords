@@ -124,7 +124,7 @@ export default function GraphClient() {
 	};
 
 	return (
-		<div className="relative">
+		<div className="relative flex h-full flex-1 flex-col">
 			<GraphToolbar
 				limit={limit}
 				setLimit={setLimit}
@@ -141,10 +141,13 @@ export default function GraphClient() {
 				onOpenAdd={() => setAddOpen(true)}
 			/>
 
-			<div className="relative rounded-xl border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+			<div className="relative flex flex-1 flex-col border border-zinc-200 bg-white p-3 shadow-sm sm:flex-none sm:rounded-xl dark:border-zinc-800 dark:bg-zinc-950">
 				{isInitialLoading && <LoadingOverlay label="Loading graph…" />}
 
-				<div ref={containerRef} className="h-[560px] w-full" />
+				<div
+					ref={containerRef}
+					className="flex min-h-[300px] w-full flex-1 sm:min-h-[560px]"
+				/>
 
 				<div className="mt-3 text-xs text-zinc-500">
 					Wheel/pinch to zoom. Double click/tap to zoom in. Drag nodes to
