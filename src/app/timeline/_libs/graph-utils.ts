@@ -14,8 +14,3 @@ export function isTopic(n: HistorianEventNode) {
 export function isExtraNode(n: HistorianEventNode) {
 	return nodeType(n) !== "event";
 }
-
-export function labelFor(n: HistorianEventNode) {
-	if (isExtraNode(n)) return n.title;
-	return `${n.created} · ${n.title}`;
-}

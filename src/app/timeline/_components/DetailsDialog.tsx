@@ -13,7 +13,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { labelFor, nodeType } from "../_libs/graph-utils";
+import { nodeType } from "../_libs/graph-utils";
 import type { Graph, HistorianEventNode } from "../_types/types";
 
 const SECTION_HEADER =
@@ -38,10 +38,12 @@ export function DetailsDialog(props: {
 
 	return (
 		<Dialog open={props.open} onOpenChange={props.onOpenChange}>
-			<DialogContent className="flex max-h-[90vh] max-w-none flex-col overflow-hidden rounded-xs sm:max-w-6xl">
+			<DialogContent className="flex max-h-[90vh] max-w-none flex-col gap-2 overflow-hidden rounded-xs sm:max-w-6xl sm:gap-4">
 				<DialogHeader>
-					<DialogTitle>{node ? labelFor(node) : "Details"}</DialogTitle>
-					<DialogDescription>
+					<DialogTitle className="wrap-break-word pr-8 text-left font-bold text-sm leading-snug sm:text-xl">
+						{node ? node.title : "Details"}
+					</DialogTitle>
+					<DialogDescription className="hidden">
 						type:{" "}
 						<span className="font-medium text-zinc-700 dark:text-zinc-200">
 							{typeLabel}
@@ -59,9 +61,19 @@ export function DetailsDialog(props: {
 					{node && (
 						<>
 							{(node.theme || hasMeta) && (
-								<section className="space-y-1">
+								<section className="space-y-1 text-xs sm:text-sm">
 									{hasMeta && (
-										<dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
+										<dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
+											{node.created && (
+												<>
+													<dt className="text-zinc-500 dark:text-zinc-400">
+														Created
+													</dt>
+													<dd className="text-zinc-800 dark:text-zinc-100">
+														{node.created}
+													</dd>
+												</>
+											)}
 											{node.kind && (
 												<>
 													<dt className="text-zinc-500 dark:text-zinc-400">
@@ -132,7 +144,7 @@ export function DetailsDialog(props: {
 							{nodeType(node) === "event" && node.content && (
 								<section>
 									<h3 className={SECTION_HEADER}>Content</h3>
-									<div className="markdown mt-2 rounded-lg border border-zinc-200 bg-zinc-50/70 p-4 text-[15px] text-zinc-800 leading-7 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100">
+									<div className="markdown mt-2 rounded-lg border border-zinc-200 bg-zinc-50/70 p-4 text-xs text-zinc-800 leading-7 sm:text-sm dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100">
 										<ReactMarkdown
 											remarkPlugins={[remarkGfm]}
 											rehypePlugins={[rehypeHighlight]}
