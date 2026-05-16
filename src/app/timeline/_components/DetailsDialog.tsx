@@ -155,7 +155,7 @@ export function DetailsDialog(props: {
 								</section>
 							)}
 
-							<section>
+							<section className="p-1">
 								<h3 className={SECTION_HEADER}>Neighbors</h3>
 								<div className="mt-2 flex flex-wrap gap-2">
 									{neighborIds.length === 0 ? (
@@ -179,16 +179,15 @@ export function DetailsDialog(props: {
 															: "border-zinc-200 text-zinc-700 dark:border-zinc-800 dark:text-zinc-200";
 
 											return (
-												<button
-													type="button"
+												<Button
 													key={id}
 													onClick={() => props.onSelectNeighbor(id)}
-													className={`cursor-pointer rounded-full border px-2.5 py-1 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-800/70 ${cls}`}
+													className={`h-6 cursor-pointer rounded-full border bg-white px-2.5 py-1 text-xs hover:bg-zinc-50 dark:hover:bg-zinc-800/70 ${cls}`}
 												>
 													{neighbor.title.length > 36
 														? `${neighbor.title.slice(0, 36)}…`
 														: neighbor.title}
-												</button>
+												</Button>
 											);
 										})
 									)}
