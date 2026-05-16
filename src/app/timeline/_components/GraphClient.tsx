@@ -16,11 +16,11 @@ export default function GraphClient() {
 	const [detailsOpen, setDetailsOpen] = useState(false);
 	const [addOpen, setAddOpen] = useState(false);
 
-	const [limit, setLimit] = useState(200);
+	const [limit, setLimit] = useState(500);
 
 	const [showEvents, setShowEvents] = useState(true);
 	const [showTopics, setShowTopics] = useState(true);
-	const [showTags, setShowTags] = useState(false);
+	const [showTags, setShowTags] = useState(true);
 	const [showPeople, setShowPeople] = useState(true);
 
 	const [form, setForm] = useState<AddEventForm>({

@@ -34,7 +34,7 @@ export function GraphToolbar(props: {
 					className="w-20"
 					type="number"
 					min={10}
-					max={200}
+					max={1000}
 					value={props.limit}
 					onChange={(e) => {
 						const value = Number(e.target.value);
