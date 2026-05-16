@@ -25,17 +25,3 @@ export type Graph = {
 };
 
 export type NodeType = "topic" | "tag" | "person" | "event";
-
-export type SimNode = HistorianEventNode & {
-	x?: number;
-	y?: number;
-	vx?: number;
-	vy?: number;
-	index?: number;
-};
-
-export type SimLink = {
-	source: string | SimNode;
-	target: string | SimNode;
-	type: string;
-};

@@ -1,16 +1,13 @@
 "use client";
 
-import { zoomIdentity } from "d3-zoom";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { nodeType } from "../_libs/graph-utils";
-import { useForceSimulation } from "../_libs/useForceSimulation";
+import { useCytoscapeGraph } from "../_libs/useCytoscapeGraph";
 import { useGraphData } from "../_libs/useGraphData";
-import { useZoomPan } from "../_libs/useZoom";
 import type { Graph } from "../_types/types";
 import { AddEventDialog, type AddEventForm } from "./AddEventDialog";
 import { DetailsDialog } from "./DetailsDialog";
-import { GraphCanvas } from "./GraphCanvas";
 import { GraphToolbar } from "./GraphToolbar";
 import { LoadingOverlay } from "./LoadingOverlay";
 
@@ -19,7 +16,7 @@ export default function GraphClient() {
 	const [detailsOpen, setDetailsOpen] = useState(false);
 	const [addOpen, setAddOpen] = useState(false);
 
-	const [limit, setLimit] = useState(80);
+	const [limit, setLimit] = useState(200);
 
 	const [showEvents, setShowEvents] = useState(true);
 	const [showTopics, setShowTopics] = useState(true);
@@ -41,30 +38,8 @@ export default function GraphClient() {
 		content: "",
 		linkFromSelected: true,
 	});
-	const [size, setSize] = useState({ w: 900, h: 560 });
 
-	const svgRef = useRef<SVGSVGElement | null>(null);
 	const containerRef = useRef<HTMLDivElement | null>(null);
-
-	// Drag handling (keep simple; works alongside zoom)
-	const dragRef = useRef<{
-		id: string;
-		dx: number;
-		dy: number;
-		startX: number;
-		startY: number;
-		startT: number;
-		pointerType: string;
-	} | null>(null);
-
-	const {
-		transform,
-		resetView,
-		onSvgDoubleClick,
-		onSvgPointerDown,
-		applyTransform,
-		isPinchingRef,
-	} = useZoomPan(svgRef, size);
 
 	const { graph, error, isInitialLoading, fetchGraph } = useGraphData(limit);
 
@@ -86,8 +61,13 @@ export default function GraphClient() {
 		return { nodes, edges };
 	}, [graph, showEvents, showPeople, showTags, showTopics]);
 
-	const { simNodes, simLinks, nodesRef, nudge, renderTick } =
-		useForceSimulation(filteredGraph, size);
+	const { resetView } = useCytoscapeGraph({
+		containerRef,
+		graph: filteredGraph,
+		selectedId,
+		onSelect: setSelectedId,
+		onOpenDetails: () => setDetailsOpen(true),
+	});
 
 	useEffect(() => {
 		if (error) {
@@ -120,93 +100,6 @@ export default function GraphClient() {
 		return filteredGraph.nodes.find((n) => n.id === selectedId) ?? null;
 	}, [filteredGraph, selectedId]);
 
-	const highlighted = useMemo(() => {
-		if (!selectedId) return new Set<string>();
-		const set = new Set<string>();
-		set.add(selectedId);
-		for (const n of adjacency.get(selectedId) ?? []) set.add(n);
-		return set;
-	}, [adjacency, selectedId]);
-
-	useEffect(() => {
-		const el = containerRef.current;
-		if (!el) return;
-
-		const ro = new ResizeObserver((entries) => {
-			const entry = entries[0];
-			if (!entry) return;
-			const cr = entry.contentRect;
-			if (cr.width > 0 && cr.height > 0) {
-				setSize({ w: Math.floor(cr.width), h: Math.floor(cr.height) });
-			}
-		});
-
-		ro.observe(el);
-		return () => ro.disconnect();
-	}, []);
-
-	const centerOnSelected = useCallback(() => {
-		if (!selectedId) return;
-		const node = simNodes.find((n) => n.id === selectedId);
-		if (!node || node.x == null || node.y == null) return;
-		const k = transform.k;
-		const x = size.w / 2 - node.x * k;
-		const y = size.h / 2 - node.y * k;
-		// use same scale, only pan
-		applyTransform(zoomIdentity.translate(x, y).scale(k));
-	}, [applyTransform, selectedId, simNodes, size.h, size.w, transform]);
-
-	const onNodePointerDown = (e: React.PointerEvent, id: string) => {
-		const n = simNodes.find((x) => x.id === id);
-		if (!n || n.x == null || n.y == null) return;
-		(e.currentTarget as any).setPointerCapture?.(e.pointerId);
-		dragRef.current = {
-			id,
-			dx: n.x - e.clientX,
-			dy: n.y - e.clientY,
-			startX: e.clientX,
-			startY: e.clientY,
-			startT: Date.now(),
-			pointerType: e.pointerType,
-		};
-		// Select immediately, but only open Details on a confirmed TAP (pointerup).
-		setSelectedId(id);
-	};
-
-	const onPointerMove = (e: React.PointerEvent) => {
-		const drag = dragRef.current;
-		if (!drag) return;
-		const n = nodesRef.current.find((x) => x.id === drag.id);
-		if (!n) return;
-		n.x = e.clientX + drag.dx;
-		n.y = e.clientY + drag.dy;
-		n.vx = 0;
-		n.vy = 0;
-		nudge();
-	};
-
-	const onPointerUp = (e: React.PointerEvent) => {
-		const drag = dragRef.current;
-		if (drag) {
-			dragRef.current = null;
-			(e.currentTarget as any).releasePointerCapture?.(e.pointerId);
-
-			// If user is pinching/zooming, do NOT treat this as a tap.
-			if (isPinchingRef.current) {
-				return;
-			}
-
-			const dt = Date.now() - drag.startT;
-			const dx = Math.abs(e.clientX - drag.startX);
-			const dy = Math.abs(e.clientY - drag.startY);
-			const isTap = dt < 350 && dx < 10 && dy < 10;
-
-			if (isTap) {
-				setDetailsOpen(true);
-			}
-		}
-	};
-
 	const ingest = async (payload: {
 		ingestKey: string;
 		event: any;
@@ -237,8 +130,6 @@ export default function GraphClient() {
 				setLimit={setLimit}
 				onRefresh={fetchGraph}
 				onResetView={resetView}
-				onCenter={centerOnSelected}
-				canCenter={Boolean(selectedId)}
 				showEvents={showEvents}
 				setShowEvents={setShowEvents}
 				showTopics={showTopics}
@@ -250,30 +141,14 @@ export default function GraphClient() {
 				onOpenAdd={() => setAddOpen(true)}
 			/>
 
-			<div
-				ref={containerRef}
-				className="relative rounded-xl border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
-			>
+			<div className="relative rounded-xl border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
 				{isInitialLoading && <LoadingOverlay label="Loading graph…" />}
 
-				<GraphCanvas
-					svgRef={svgRef}
-					transform={transform}
-					simNodes={simNodes}
-					simLinks={simLinks}
-					selectedId={selectedId}
-					highlighted={highlighted}
-					onPointerMove={onPointerMove}
-					onPointerUp={onPointerUp}
-					onNodePointerDown={onNodePointerDown}
-					onSvgDoubleClick={onSvgDoubleClick}
-					onSvgPointerDown={onSvgPointerDown}
-				/>
+				<div ref={containerRef} className="h-[560px] w-full" />
 
 				<div className="mt-3 text-xs text-zinc-500">
 					Wheel/pinch to zoom. Double click/tap to zoom in. Drag nodes to
 					adjust.
-					<span className="sr-only">tick {renderTick}</span>
 				</div>
 			</div>
 

@@ -10,13 +10,6 @@ export default function TimelinePage() {
 					<h1 className="font-semibold text-2xl text-zinc-900 tracking-tight dark:text-zinc-50">
 						Timeline
 					</h1>
-					<p className="mt-2 text-sm text-zinc-600 leading-6 dark:text-zinc-400">
-						Graph-first view of Historian notes. Uses{" "}
-						<code className="rounded bg-zinc-100 px-1 py-0.5 dark:bg-zinc-900">
-							/graphql
-						</code>
-						.
-					</p>
 				</div>
 
 				<GraphClient />

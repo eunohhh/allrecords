@@ -9,8 +9,6 @@ export function GraphToolbar(props: {
 	setLimit: (n: number) => void;
 	onRefresh: () => void;
 	onResetView: () => void;
-	onCenter: () => void;
-	canCenter: boolean;
 	showEvents: boolean;
 	setShowEvents: (v: boolean) => void;
 	showTopics: boolean;
@@ -54,14 +52,6 @@ export function GraphToolbar(props: {
 					title="Reset zoom/pan"
 				>
 					Reset view
-				</Button>
-				<Button
-					variant="outline"
-					onClick={props.onCenter}
-					disabled={!props.canCenter}
-					title="Center on selected node"
-				>
-					Center
 				</Button>
 
 				<div className="flex flex-wrap items-center gap-3 rounded-md border border-zinc-200 px-3 py-2 text-xs text-zinc-600 dark:border-zinc-800 dark:text-zinc-300">
