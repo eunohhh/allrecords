@@ -1,6 +1,6 @@
 export default function PrivacyPolicyPage() {
 	return (
-		<main className="min-h-screen bg-background text-foreground">
+		<main className="min-h-svh bg-background text-foreground">
 			<div className="container mx-auto max-w-3xl px-6 py-12">
 				<header className="mb-10 space-y-2">
 					<p className="text-muted-foreground text-sm">시행일: 2026-04-17</p>

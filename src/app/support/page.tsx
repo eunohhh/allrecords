@@ -1,6 +1,6 @@
 function SupportPage() {
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center gap-4">
+		<div className="flex min-h-svh flex-col items-center justify-center gap-4">
 			<h1 className="font-bold text-4xl">Allrecords Support</h1>
 			<p className="text-lg">This app is intended for private use.</p>
 			<p className="text-lg">

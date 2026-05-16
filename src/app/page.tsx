@@ -1,6 +1,6 @@
 export default function Home() {
 	return (
-		<div className="min-h-screen bg-zinc-50 px-4 py-12 font-sans dark:bg-black">
+		<div className="min-h-svh bg-zinc-50 px-4 py-12 font-sans dark:bg-black">
 			<main className="mx-auto w-full max-w-3xl space-y-8">
 				<section className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
 					<h1 className="font-semibold text-3xl text-zinc-900 tracking-tight dark:text-zinc-50">
