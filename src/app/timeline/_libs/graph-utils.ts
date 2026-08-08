@@ -1,16 +1,16 @@
 import type { HistorianEventNode, NodeType } from "../_types/types";
 
 export function nodeType(n: HistorianEventNode): NodeType {
-	if (n.id.startsWith("topic:")) return "topic";
-	if (n.id.startsWith("tag:")) return "tag";
-	if (n.id.startsWith("person:")) return "person";
-	return "event";
+  if (n.id.startsWith("topic:")) return "topic";
+  if (n.id.startsWith("tag:")) return "tag";
+  if (n.id.startsWith("person:")) return "person";
+  return "event";
 }
 
 export function isTopic(n: HistorianEventNode) {
-	return nodeType(n) === "topic";
+  return nodeType(n) === "topic";
 }
 
 export function isExtraNode(n: HistorianEventNode) {
-	return nodeType(n) !== "event";
+  return nodeType(n) !== "event";
 }
