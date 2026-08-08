@@ -19,9 +19,9 @@ export default defineConfig({
     environment: "node",
     setupFiles: ["./tests/setup.ts"],
     // 단위 테스트는 소스 옆에 co-locate(예: src/lib/utils.test.ts).
-    // tests/** 는 통합 테스트 전용이라 단위 스위트에서 제외한다
+    // tests/integration** 는 통합 테스트 전용이라 단위 스위트에서 제외한다
     // (vitest.config.integration.mts 참조).
-    exclude: [...configDefaults.exclude, "tests/**"],
+    exclude: [...configDefaults.exclude, "tests/integration/**"],
     env: {
       // env.ts의 strict 검증 우회
       CI: "true",
