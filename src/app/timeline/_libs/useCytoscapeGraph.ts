@@ -121,11 +121,11 @@ function buildElements(graph: Graph): ElementDefinition[] {
   return [...nodes, ...edges];
 }
 
-function runLayout(cy: Core) {
+function runLayout(cy: Core, randomize: boolean) {
   cy.layout({
     name: "fcose",
     animate: false,
-    randomize: true,
+    randomize,
     quality: "default",
     nodeRepulsion: () => 9000,
     idealEdgeLength: (edge: cytoscape.EdgeSingular) => {
@@ -162,10 +162,16 @@ export function useCytoscapeGraph(params: Params): Result {
 
   const onSelectRef = useRef(onSelect);
   const onOpenDetailsRef = useRef(onOpenDetails);
+  const selectedIdRef = useRef(selectedId);
+  // 재구성 사이에 노드 좌표를 보존한다(필터로 숨겼다 되살린 노드 포함).
+  const positionsRef = useRef(new Map<string, cytoscape.Position>());
   useEffect(() => {
     onSelectRef.current = onSelect;
     onOpenDetailsRef.current = onOpenDetails;
   }, [onSelect, onOpenDetails]);
+  useEffect(() => {
+    selectedIdRef.current = selectedId;
+  }, [selectedId]);
 
   useEffect(() => {
     ensureExtensions();
@@ -213,22 +219,46 @@ export function useCytoscapeGraph(params: Params): Result {
     };
   }, [containerRef]);
 
+  // selectedId를 deps에 넣으면 노드 선택만으로 전체 요소 재구성 + 레이아웃
+  // 재실행(randomize)이 일어나 노드가 재배치된다. graph 변경에만 반응하고,
+  // 재구성 후 선택 상태 복원은 ref로 읽는다.
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy) return;
+    // 제거 전에 현재 좌표(드래그로 옮긴 위치 포함)를 보존
+    cy.nodes().forEach((n) => {
+      positionsRef.current.set(n.id(), { ...n.position() });
+    });
     cy.batch(() => {
       cy.elements().remove();
       if (graph) cy.add(buildElements(graph));
     });
     if (graph && graph.nodes.length > 0) {
-      runLayout(cy);
+      let newCount = 0;
+      cy.batch(() => {
+        cy.nodes().forEach((n) => {
+          const pos = positionsRef.current.get(n.id());
+          if (pos) n.position(pos);
+          else newCount += 1;
+        });
+      });
+      if (newCount === cy.nodes().length) {
+        // 최초 로드: 전체 무작위 배치
+        runLayout(cy, true);
+      } else if (newCount > 0) {
+        // 새 노드가 섞인 갱신(이벤트 추가·조회 확대): 기존 위치를 시작점으로
+        // 증분 배치해 연속성을 유지한다
+        runLayout(cy, false);
+      }
+      // newCount === 0 (필터 토글, 동일 데이터 재조회): 레이아웃 생략, 위치 유지
     }
+    const selectedId = selectedIdRef.current;
     applyHighlight(cy, selectedId);
     if (selectedId) {
       const sel = cy.$id(selectedId);
       if (!sel.empty()) sel.select();
     }
-  }, [graph, selectedId]);
+  }, [graph]);
 
   useEffect(() => {
     const cy = cyRef.current;
