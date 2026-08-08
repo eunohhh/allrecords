@@ -6,8 +6,8 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": true,
     "includes": [
+      "**",
       "src/**/*",
       "app/**/*",
       "proxy.ts",
@@ -17,8 +17,7 @@
       "!build",
       "!public",
       "!src/components/ui",
-      "!**/*.css",
-      "!src/types/supabase-types.ts"
+      "!**/*.css"
     ]
   },
   "formatter": {
