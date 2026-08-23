@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Graph } from "../_types/types";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
-
+// 백엔드 /graphql 을 직접 부르지 않고 같은 오리진의 서버 라우트를 경유한다.
+// 읽기에도 인증이 걸려 있고, 그 키는 브라우저로 내려보낼 수 없기 때문.
+// 프록시: src/app/api/graph/route.ts
 export function useGraphData(limit: number) {
   const [graph, setGraph] = useState<Graph | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -14,27 +14,15 @@ export function useGraphData(limit: number) {
     setError(null);
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/graphql`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          query: `query ($limit: Int!) {
-            historianGraph(limit: $limit) {
-              nodes { id created title content sourcePath theme source kind era year tags people }
-              edges { from to type }
-            }
-          }`,
-          variables: { limit },
-        }),
+      const res = await fetch(`/api/graph?limit=${limit}`, {
+        cache: "no-store",
       });
 
       const json = (await res.json()) as any;
-      if (!res.ok || json.errors) {
-        throw new Error(
-          json.errors?.[0]?.message ?? `GraphQL error (${res.status})`
-        );
+      if (!res.ok) {
+        throw new Error(json?.error ?? `Failed to load graph (${res.status})`);
       }
-      setGraph(json.data.historianGraph as Graph);
+      setGraph(json as Graph);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load graph");
       setGraph(null);
