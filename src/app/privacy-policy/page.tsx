@@ -3,7 +3,7 @@ export default function PrivacyPolicyPage() {
     <main className="min-h-svh bg-background text-foreground">
       <div className="container mx-auto max-w-3xl px-6 py-12">
         <header className="mb-10 space-y-2">
-          <p className="text-muted-foreground text-sm">시행일: 2026-04-17</p>
+          <p className="text-muted-foreground text-sm">시행일: 2026-10-18</p>
           <h1 className="font-bold text-3xl tracking-tight">
             개인정보 처리방침
           </h1>
@@ -27,6 +27,11 @@ export default function PrivacyPolicyPage() {
               <li>이용 정보: 앱 사용 기록, 접속 로그, 오류 기록</li>
               <li>기기 정보: OS/버전, 기기 식별자(비식별), 푸시 알림 토큰</li>
               <li>
+                위치 정보: 사용자가 위치 공유를 시작하거나 참여한 경우에 한해,
+                공유하는 동안의 정확한 위치(위도·경도, 정확도, 이동 속도·방향,
+                측정 시각)
+              </li>
+              <li>
                 Google Calendar 데이터: 사용자가 Google Calendar 연동을 허용한
                 경우, 사용자가 소유한 캘린더의 일정 정보(제목, 날짜/시간, 설명
                 등)를 수집합니다.
@@ -43,6 +48,10 @@ export default function PrivacyPolicyPage() {
             <ul className="list-disc space-y-1 pl-5 text-muted-foreground text-sm">
               <li>계정 생성 및 본인 확인</li>
               <li>가족 간 일정/메모 공유 기능 제공</li>
+              <li>
+                가족이 만날 때 서로의 위치를 지도에 보여 주는 위치 공유 기능
+                제공
+              </li>
               <li>알림 발송 및 서비스 운영</li>
               <li>오류 분석 및 서비스 개선</li>
             </ul>
@@ -122,7 +131,36 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <div className="space-y-3">
-            <h2 className="font-semibold text-lg">4. 보관 및 파기</h2>
+            <h2 className="font-semibold text-lg">4. 위치 정보</h2>
+            <ul className="list-disc space-y-1 pl-5 text-muted-foreground text-sm">
+              <li>
+                위치는 사용자가 앱에서 위치 공유를 직접 시작하거나 참여한
+                동안에만 수집합니다. 한 번의 공유는 최대 1시간이며, 시간이
+                지나거나 공유를 시작한 사람이 끝내면 자동으로 멈춥니다.
+              </li>
+              <li>
+                공유 중에는 앱이 백그라운드에 있거나 화면이 꺼져 있어도 위치가
+                전송되며, 이 동안 기기 화면 상단에 위치 사용 표시가 나타납니다.
+                &quot;항상 허용&quot; 권한은 요청하지 않습니다.
+              </li>
+              <li>
+                위치는 같은 공유에 참여한 가족 구성원에게만 보이며, 다른
+                사람에게 제공하지 않습니다.
+              </li>
+              <li>
+                서버에는 참여자별 가장 최근 위치 1건만 저장하고 이동 기록은
+                남기지 않습니다. 공유가 끝나면 해당 공유의 위치 정보를 1분 안에
+                삭제합니다.
+              </li>
+              <li>
+                사용자는 언제든지 공유에서 빠지거나, 기기 설정에서 위치 권한을
+                끌 수 있습니다.
+              </li>
+            </ul>
+          </div>
+
+          <div className="space-y-3">
+            <h2 className="font-semibold text-lg">5. 보관 및 파기</h2>
             <p className="text-muted-foreground text-sm">
               개인정보는 목적 달성 후 지체 없이 파기합니다. 다만 관련 법령에
               따라 보관이 필요한 경우 해당 기간 동안 보관 후 파기합니다.
@@ -131,7 +169,7 @@ export default function PrivacyPolicyPage() {
 
           <div className="space-y-3">
             <h2 className="font-semibold text-lg">
-              5. 제3자 제공 및 처리 위탁
+              6. 제3자 제공 및 처리 위탁
             </h2>
             <p className="text-muted-foreground text-sm">
               서비스는 원칙적으로 개인정보를 제3자에게 제공하지 않습니다. 서비스
@@ -141,7 +179,7 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <div className="space-y-3">
-            <h2 className="font-semibold text-lg">6. 이용자 권리</h2>
+            <h2 className="font-semibold text-lg">7. 이용자 권리</h2>
             <ul className="list-disc space-y-1 pl-5 text-muted-foreground text-sm">
               <li>개인정보 열람, 정정, 삭제 요청</li>
               <li>처리 정지 요청</li>
@@ -153,7 +191,7 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <div className="space-y-3">
-            <h2 className="font-semibold text-lg">7. 보안</h2>
+            <h2 className="font-semibold text-lg">8. 보안</h2>
             <p className="text-muted-foreground text-sm">
               서비스는 개인정보 보호를 위해 합리적인 기술적/관리적 보호조치를
               시행합니다.
@@ -161,7 +199,7 @@ export default function PrivacyPolicyPage() {
           </div>
 
           <div className="space-y-3">
-            <h2 className="font-semibold text-lg">8. 문의처</h2>
+            <h2 className="font-semibold text-lg">9. 문의처</h2>
             <div className="rounded-lg border border-border p-4 text-muted-foreground text-sm">
               <p>운영자: 오은</p>
               <p>이메일: bdohhhhh@gmail.com</p>
